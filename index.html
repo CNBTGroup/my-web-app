@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITR Filing ERP — CA Practice Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#080E1A;--bg2:#0D1626;--bg3:#111E33;--surface:#152035;--surface2:#1C2B45;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#E2E8F4;--text2:#94A3B8;--text3:#64748B;--accent:#F97316;--accent2:#FB923C;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;--info:#3B82F6;--purple:#8B5CF6;--gold:#EAB308;--navy:#0F172A;--glow:0 0 30px rgba(249,115,22,0.15);--shadow:0 8px 32px rgba(0,0,0,0.4);--radius:12px;--radius2:8px;--sidebar-w:240px;--header-h:64px;--font:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--font-display:'Syne',sans-serif;--transition:0.2s cubic-bezier(0.4,0,0.2,1)}
+[data-theme="light"]{--bg:#F1F5F9;--bg2:#FFFFFF;--bg3:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#0F172A;--text2:#475569;--text3:#94A3B8;--shadow:0 4px 24px rgba(0,0,0,0.1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden}
+a{color:var(--accent);text-decoration:none}
+button{cursor:pointer;font-family:var(--font)}
+input,select,textarea{font-family:var(--font)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden;transition:width var(--transition)}
+#sidebar.collapsed{width:64px}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+#header{height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:24px}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#C05621);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:16px;color:white;flex-shrink:0}
+.logo-text{font-family:var(--font-display);font-weight:700;font-size:15px;line-height:1.2;overflow:hidden;transition:opacity var(--transition)}
+.logo-text span{display:block;font-size:11px;font-weight:400;color:var(--text2);font-family:var(--font)}
+#sidebar.collapsed .logo-text,#sidebar.collapsed .nav-label,#sidebar.collapsed .nav-section-label,#sidebar.collapsed .sidebar-ay-badge{opacity:0;pointer-events:none}
+.sidebar-ay-badge{margin:12px 16px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);border-radius:var(--radius2);padding:10px 12px;transition:opacity var(--transition)}
+.ay-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.ay-value{font-weight:600;font-size:14px;color:var(--accent)}
+.phase-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.phase-badge.primary{background:rgba(16,185,129,0.2);color:var(--success)}
+.phase-badge.extended{background:rgba(245,158,11,0.2);color:var(--warning)}
+.phase-badge.revised{background:rgba(59,130,246,0.2);color:var(--info)}
+.phase-badge.opened{background:rgba(249,115,22,0.2);color:var(--accent)}
+nav{flex:1;overflow-y:auto;padding:8px 0}
+.nav-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:16px 16px 6px;transition:opacity var(--transition)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:var(--radius2);cursor:pointer;color:var(--text2);transition:all var(--transition);font-size:13.5px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(249,115,22,0.12);color:var(--accent)}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.8}
+.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius2);cursor:pointer;transition:background var(--transition)}
+.user-card:hover{background:var(--surface2)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0}
+.user-info{overflow:hidden;transition:opacity var(--transition)}
+.user-name{font-size:13px;font-weight:600}
+.user-role{font-size:11px;color:var(--text2)}
+#sidebar.collapsed .user-info{opacity:0}
+.sidebar-toggle{background:none;border:none;color:var(--text2);padding:6px;border-radius:6px;transition:all var(--transition);display:flex}
+.sidebar-toggle:hover{background:var(--surface2);color:var(--text)}
+.header-ay{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);font-size:13px;font-weight:500}
+.header-ay select{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;outline:none;font-family:var(--font);font-size:13px}
+.header-phase{padding:4px 10px;background:rgba(16,185,129,0.15);border-radius:20px;font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:.5px}
+.header-date{color:var(--text2);font-size:12px}
+.header-spacer{flex:1}
+.header-btn{background:none;border:none;color:var(--text2);padding:8px;border-radius:8px;cursor:pointer;display:flex;align-items:center;transition:all var(--transition);position:relative}
+.header-btn:hover{background:var(--surface2);color:var(--text)}
+.notif-badge{position:absolute;top:4px;right:4px;background:var(--danger);color:white;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.header-module-title{font-family:var(--font-display);font-size:16px;font-weight:700}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.flex{display:flex}.flex-col{display:flex;flex-direction:column}
+.items-center{align-items:center}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:all var(--transition)}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-card.green::before{background:var(--success)}.kpi-card.orange::before{background:var(--accent)}
+.kpi-card.blue::before{background:var(--info)}.kpi-card.red::before{background:var(--danger)}
+.kpi-card.purple::before{background:var(--purple)}
+.kpi-label{font-size:11.5px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.kpi-value{font-family:var(--font-display);font-size:28px;font-weight:700;margin:6px 0 4px;line-height:1}
+.kpi-sub{font-size:12px;color:var(--text3)}
+.kpi-icon{position:absolute;right:16px;top:16px;opacity:.15}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius2);font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all var(--transition);white-space:nowrap;font-family:var(--font)}
+.btn-sm{padding:5px 10px;font-size:12px}.btn-xs{padding:3px 8px;font-size:11px}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:var(--accent2);box-shadow:0 4px 12px rgba(249,115,22,0.3)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg3);border-color:var(--border2)}
+.btn-success{background:var(--success);color:white}
+.btn-danger{background:var(--danger);color:white}
+.btn-ghost{background:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.badge-pending{background:rgba(100,116,139,0.2);color:#94A3B8}
+.badge-docs{background:rgba(245,158,11,0.15);color:var(--warning)}
+.badge-prep{background:rgba(59,130,246,0.15);color:var(--info)}
+.badge-review{background:rgba(139,92,246,0.15);color:var(--purple)}
+.badge-approval{background:rgba(249,115,22,0.15);color:var(--accent)}
+.badge-filed{background:rgba(16,185,129,0.15);color:var(--success)}
+.badge-ack{background:rgba(16,185,129,0.2);color:#34D399}
+.badge-completed{background:rgba(16,185,129,0.25);color:#6EE7B7}
+.badge-overdue{background:rgba(239,68,68,0.15);color:var(--danger)}
+.badge-defective{background:rgba(239,68,68,0.2);color:#FCA5A5}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);transition:background var(--transition)}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:10px 12px;color:var(--text2);vertical-align:middle}
+tbody td:first-child{color:var(--text);font-weight:500}
+.tr-overdue{background:rgba(239,68,68,0.04)!important}
+.tr-overdue:hover{background:rgba(239,68,68,0.08)!important}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px}
+.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:9px 12px;color:var(--text);font-size:13.5px;outline:none;transition:all var(--transition);width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,0.1)}
+.form-input::placeholder{color:var(--text3)}
+.form-input.error{border-color:var(--danger)}
+.form-error{font-size:11px;color:var(--danger)}
+.form-hint{font-size:11px;color:var(--text3)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text2);border-radius:var(--radius2) var(--radius2) 0 0;cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition);margin-bottom:-1px}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--font-display);font-size:16px;font-weight:700}
+.section-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{position:relative}
+.search-box input{padding-left:34px;min-width:240px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--transition)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:90%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.5);transform:scale(0.96) translateY(8px);transition:all var(--transition)}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-lg{max-width:960px}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-family:var(--font-display);font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;border-radius:6px;display:flex}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius2)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.loading-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast-container{position:fixed;top:20px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;box-shadow:var(--shadow);animation:slideIn .3s ease;max-width:360px}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.success{border-left:3px solid var(--success)}.toast.error{border-left:3px solid var(--danger)}
+.toast.warning{border-left:3px solid var(--warning)}.toast.info{border-left:3px solid var(--info)}
+.progress-bar{background:var(--surface2);border-radius:20px;height:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px;transition:width .5s ease}
+.progress-fill.green{background:var(--success)}.progress-fill.orange{background:var(--accent)}
+.progress-fill.blue{background:var(--info)}.progress-fill.red{background:var(--danger)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 32px;gap:12px;color:var(--text3);text-align:center}
+.empty-icon{font-size:48px;opacity:.3}.empty-title{font-size:15px;font-weight:600;color:var(--text2)}.empty-desc{font-size:13px;max-width:300px}
+.pagination{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:16px}
+.page-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius2);cursor:pointer;font-size:13px;transition:all var(--transition);border:1px solid var(--border);background:var(--surface);color:var(--text2)}
+.page-btn:hover,.page-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.kanban-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;overflow-x:auto;padding-bottom:12px}
+.kanban-col{background:var(--bg3);border-radius:var(--radius);padding:12px;min-height:400px}
+.kanban-col-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 4px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);margin-bottom:10px}
+.kanban-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all var(--transition)}
+.kanban-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.kanban-card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.kanban-card-pan{font-size:11px;color:var(--text3);font-family:var(--font-mono)}
+.gauge-wrap{display:flex;flex-direction:column;align-items:center}
+.gauge-score{font-family:var(--font-display);font-size:36px;font-weight:800}
+.gauge-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.alert-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-dot.critical{background:var(--danger);box-shadow:0 0 6px var(--danger)}.alert-dot.high{background:var(--warning)}.alert-dot.medium{background:var(--info)}
+.alert-name{font-size:13px;font-weight:500}.alert-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.activity-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.activity-avatar{width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.activity-text{font-size:12.5px;color:var(--text2);line-height:1.5}.activity-time{font-size:10px;color:var(--text3);margin-top:2px}
+.notif-dropdown{position:absolute;right:0;top:calc(100% + 8px);width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);z-index:200;display:none;max-height:440px;overflow-y:auto}
+.notif-dropdown.open{display:block}
+.notif-header{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.notif-item{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:background var(--transition)}
+.notif-item:hover{background:var(--surface2)}
+.notif-item-title{font-size:13px;font-weight:500}.notif-item-msg{font-size:12px;color:var(--text2);margin-top:3px}.notif-item-meta{font-size:11px;color:var(--text3);margin-top:3px}
+.notif-priority-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}
+.priority-critical{background:var(--danger)}.priority-high{background:var(--warning)}.priority-medium{background:var(--info)}
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.4)}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.login-logo .logo-mark{width:44px;height:44px;font-size:20px}
+.login-title{font-family:var(--font-display);font-size:20px;font-weight:800}
+.login-title span{display:block;font-size:12px;font-weight:400;color:var(--text2);margin-top:2px;font-family:var(--font)}
+.login-form{display:flex;flex-direction:column;gap:16px}
+.login-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--danger);padding:10px 14px;border-radius:var(--radius2);font-size:13px;display:none}
+.login-footer{margin-top:20px;font-size:12px;color:var(--text3);text-align:center}
+.ay-banner{background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(139,92,246,0.15));border:1px solid rgba(249,115,22,0.3);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.return-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.return-stat{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.return-stat-val{font-weight:700;font-size:15px;color:var(--text)}
+.itr-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:var(--font-mono)}
+.itr-1{background:rgba(16,185,129,0.15);color:#34D399}.itr-2{background:rgba(59,130,246,0.15);color:#60A5FA}
+.itr-3{background:rgba(249,115,22,0.15);color:#FB923C}.itr-4{background:rgba(139,92,246,0.15);color:#A78BFA}
+.itr-5{background:rgba(245,158,11,0.15);color:#FCD34D}.itr-6{background:rgba(239,68,68,0.15);color:#FCA5A5}
+.itr-7{background:rgba(100,116,139,0.15);color:#94A3B8}
+.pan-text{font-family:var(--font-mono);font-size:12px;letter-spacing:1px;color:var(--text2)}
+.days-chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px}
+.days-chip.ok{background:rgba(16,185,129,0.1);color:var(--success)}.days-chip.warn{background:rgba(245,158,11,0.12);color:var(--warning)}
+.days-chip.danger{background:rgba(239,68,68,0.12);color:var(--danger)}.days-chip.overdue{background:rgba(239,68,68,0.15);color:var(--danger)}
+.text-accent{color:var(--accent)}.text-success{color:var(--success)}.text-danger{color:var(--danger)}.text-warning{color:var(--warning)}.text-muted{color:var(--text3)}
+.text-mono{font-family:var(--font-mono)}.font-bold{font-weight:700}.text-sm{font-size:12px}.text-xs{font-size:11px}
+.mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mb-16{margin-bottom:16px}
+.mr-auto{margin-right:auto}.ml-auto{margin-left:auto}.w-full{width:100%}.inline-flex{display:inline-flex}
+.items-start{align-items:flex-start}.justify-between{justify-content:space-between}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.currency-sm{font-family:var(--font-mono);font-size:13px}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all var(--transition);color:var(--text3)}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(249,115,22,0.05);color:var(--accent)}
+.chart-container{position:relative;height:200px}.chart-container-lg{position:relative;height:260px}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kpi-value{animation:countUp .5s ease forwards}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}#content{padding:12px}.modal{width:98%;margin:8px}}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-mark">₹</div>
+      <div class="login-title">ITR Filing ERP<span>CA Practice Management System</span></div>
+    </div>
+    <form class="login-form" onsubmit="Auth.login(event)">
+      <div id="login-err" class="login-err"></div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="login-email" class="form-input" placeholder="admin@itrfirm.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="login-pass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary w-full" id="login-btn">
+        <span id="login-btn-text">Sign In</span>
+      </button>
+    </form>
+    <div class="login-footer">Default credentials: admin@itrfirm.com / Admin@123</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">₹</div>
+    <div class="logo-text">ITR Filing ERP<span>CA Practice Management</span></div>
+  </div>
+  <div class="sidebar-ay-badge">
+    <div class="ay-label">Current Period</div>
+    <div class="ay-value" id="sb-ay-label">AY 2026-27</div>
+    <div class="phase-badge primary" id="sb-phase-badge">Primary Filing</div>
+  </div>
+  <nav>
+    <div class="nav-section-label">Core Modules</div>
+    <div class="nav-item active" data-route="dashboard" onclick="Router.navigate('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" data-route="clients" onclick="Router.navigate('clients')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-label">Clients</span>
+    </div>
+    <div class="nav-item" data-route="returns" onclick="Router.navigate('returns')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="nav-label">Returns</span>
+    </div>
+    <div class="nav-item" data-route="compliance" onclick="Router.navigate('compliance')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Compliance</span>
+      <span class="nav-badge" id="alert-count" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-route="invoices" onclick="Router.navigate('invoices')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="nav-label">Invoices</span>
+    </div>
+    <div class="nav-section-label">Tax Engine</div>
+    <div class="nav-item" data-route="tax-engine" onclick="Router.navigate('tax-engine')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+      <span class="nav-label">Tax Analyzer</span>
+    </div>
+    <div class="nav-item" data-route="regime" onclick="Router.navigate('regime')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span class="nav-label">Regime Compare</span>
+    </div>
+    <div class="nav-section-label">Management</div>
+    <div class="nav-item" data-route="reports" onclick="Router.navigate('reports')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-label">Reports</span>
+    </div>
+    <div class="nav-item" data-route="audit" onclick="Router.navigate('audit')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg>
+      <span class="nav-label">Audit Log</span>
+    </div>
+    <div class="nav-item" data-route="settings" onclick="Router.navigate('settings')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="nav-label">Settings</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name-display">Loading...</div>
+        <div class="user-role" id="user-role-display">—</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div id="main">
+<header id="header">
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="header-module-title" id="module-title">Dashboard</div>
+  <div class="header-ay">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <select id="ay-selector" onchange="AYManager.setAY(this.value)">
+      <option>AY 2024-25</option><option>AY 2025-26</option>
+      <option selected>AY 2026-27</option><option>AY 2027-28</option>
+      <option>AY 2028-29</option><option>AY 2029-30</option><option>AY 2030-31</option>
+    </select>
+  </div>
+  <div class="header-phase" id="header-phase-badge">Primary Filing</div>
+  <div class="header-date" id="header-date">—</div>
+  <div class="header-spacer"></div>
+  <div style="position:relative">
+    <button class="header-btn" id="notif-btn" onclick="toggleNotifications()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge" id="notif-count" style="display:none">0</span>
+    </button>
+    <div class="notif-dropdown" id="notif-dropdown">
+      <div class="notif-header">Notifications
+        <button class="btn btn-ghost btn-xs" onclick="NotifManager.markAllRead()">Mark all read</button>
+      </div>
+      <div id="notif-list"></div>
+    </div>
+  </div>
+  <button class="header-btn" onclick="toggleTheme()" title="Toggle theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+  <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Logout
+  </button>
+</header>
+<div id="content"></div>
+</div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="Modal.closeOnOverlay(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="modal-close" onclick="Modal.close()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════ */
+const CONFIG={GAS_URL:"https://script.google.com/macros/s/AKfycbxC4uaKn1UpBr8bahCSVeSg4llTO9QkQaRQxQRYpm_ZkXOnh80QFRWHFHmkKtg3arP9/exec",DEMO_MODE:false};
+
+const STATUS_CONFIG={
+  PENDING_DOCS:{label:"Pending Docs",cls:"badge-pending",color:"#64748B"},
+  DOCS_RECEIVED:{label:"Docs Received",cls:"badge-docs",color:"#F59E0B"},
+  IN_PREPARATION:{label:"In Preparation",cls:"badge-prep",color:"#3B82F6"},
+  REVIEW_PENDING:{label:"Review Pending",cls:"badge-review",color:"#8B5CF6"},
+  CLIENT_APPROVAL_PENDING:{label:"Client Approval",cls:"badge-approval",color:"#F97316"},
+  FILED:{label:"Filed",cls:"badge-filed",color:"#10B981"},
+  ACKNOWLEDGED:{label:"Acknowledged",cls:"badge-ack",color:"#34D399"},
+  COMPLETED:{label:"Completed",cls:"badge-completed",color:"#6EE7B7"},
+  DEFECTIVE:{label:"Defective",cls:"badge-defective",color:"#FCA5A5"},
+  REVISED_NEEDED:{label:"Revision Needed",cls:"badge-overdue",color:"#EF4444"}
+};
+
+/* ═══════════════════════════════════════════════════════
+   DEMO DATA
+═══════════════════════════════════════════════════════ */
+const DEMO_DATA={
+  systemAY:{currentDate:"06-May-2026",fyStart:2025,fyEnd:2026,fyLabel:"FY 2025-26",ayLabel:"AY 2026-27",filingPhase:"PRIMARY_FILING",isAYOpenDay:false,supportedAYs:["AY 2024-25","AY 2025-26","AY 2026-27","AY 2027-28","AY 2028-29","AY 2029-30","AY 2030-31"],defaultAY:"AY 2026-27"},
+  clients:[
+    {ClientID:"CLI001",PAN:"ABCDE1234F",FullName:"Rajesh Kumar Sharma",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9876543210",Email:"rajesh@gmail.com",City:"New Delhi",State:"Delhi",AssignedStaffID:"USR002",ClientCategory:"Salaried",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"01-Apr-2024"},
+    {ClientID:"CLI002",PAN:"BCDEF2345G",FullName:"Priya Nair",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"8765432109",Email:"priya@yahoo.com",City:"Mumbai",State:"Maharashtra",AssignedStaffID:"USR002",ClientCategory:"Capital_Gains",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"20-May-2023"},
+    {ClientID:"CLI003",PAN:"CDEFG3456H",FullName:"Suresh Trading Co (HUF)",EntityType:"HUF",ResidentialStatus:"Resident",MobileNo:"7654321098",Email:"suresh@business.com",City:"Ahmedabad",State:"Gujarat",AssignedStaffID:"USR003",ClientCategory:"Business",PreferredRegime:"Old",IsActive:"TRUE",OnboardingDate:"10-Jun-2023"},
+    {ClientID:"CLI004",PAN:"DEFGH4567I",FullName:"Anita Mehta",EntityType:"Individual",ResidentialStatus:"NRI",MobileNo:"9543210987",Email:"anita@outlook.com",City:"Pune",State:"Maharashtra",AssignedStaffID:"USR002",ClientCategory:"Multiple",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"30-Jul-2023"},
+    {ClientID:"CLI005",PAN:"EFGHI5678J",FullName:"Dr. Vikram Patel",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9432109876",Email:"vikram@gmail.com",City:"Ahmedabad",State:"Gujarat",AssignedStaffID:"USR003",ClientCategory:"Professional",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"25-Aug-2023"},
+    {ClientID:"CLI006",PAN:"FGHIJ6789K",FullName:"Lakshmi Constructions Pvt Ltd",EntityType:"Company",ResidentialStatus:"Resident",MobileNo:"9321098765",Email:"accounts@lakshmiconstruct.com",City:"Bangalore",State:"Karnataka",AssignedStaffID:"USR002",ClientCategory:"Business",PreferredRegime:"Old",IsActive:"TRUE",OnboardingDate:"15-Sep-2023"},
+    {ClientID:"CLI007",PAN:"GHIJK7890L",FullName:"Mohammed Ali Sheikh",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9210987654",Email:"mali@hotmail.com",City:"Hyderabad",State:"Telangana",AssignedStaffID:"USR003",ClientCategory:"Business",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"05-Oct-2023"},
+    {ClientID:"CLI008",PAN:"HIJKL8901M",FullName:"Deepa Krishnamurthy",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9109876543",Email:"deepa@techcorp.com",City:"Chennai",State:"Tamil Nadu",AssignedStaffID:"USR002",ClientCategory:"Salaried",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"18-Nov-2023"},
+    {ClientID:"CLI009",PAN:"IJKLM9012N",FullName:"Gurpreet Singh Bedi",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9098765432",Email:"gsbedi@gmail.com",City:"Chandigarh",State:"Punjab",AssignedStaffID:"USR003",ClientCategory:"Multiple",PreferredRegime:"Old",IsActive:"TRUE",OnboardingDate:"22-Dec-2023"},
+    {ClientID:"CLI010",PAN:"JKLMN0123O",FullName:"Sunita Agarwal",EntityType:"Individual",ResidentialStatus:"Resident",MobileNo:"9987654321",Email:"sunita@yahoo.in",City:"Allahabad",State:"Uttar Pradesh",AssignedStaffID:"USR002",ClientCategory:"Salaried",PreferredRegime:"New",IsActive:"TRUE",OnboardingDate:"10-Jan-2024"}
+  ],
+  returns:[
+    {ReturnID:"RET001",ClientID:"CLI001",PAN:"ABCDE1234F",ClientName:"Rajesh Kumar Sharma",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-1",FilingType:"Original",ReturnStatus:"IN_PREPARATION",AssignedStaffID:"USR002",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",TotalIncome:850000,TaxPayable:42500,TaxPaid:42500,Refund:0,BalanceDue:0,ReturnNotes:"Salaried — standard deduction applied"},
+    {ReturnID:"RET002",ClientID:"CLI002",PAN:"BCDEF2345G",ClientName:"Priya Nair",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-2",FilingType:"Original",ReturnStatus:"DOCS_RECEIVED",AssignedStaffID:"USR002",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",TotalIncome:1250000,TaxPayable:87500,TaxPaid:87500,Refund:0,BalanceDue:0,ReturnNotes:"Capital gains on MF redemption"},
+    {ReturnID:"RET003",ClientID:"CLI003",PAN:"CDEFG3456H",ClientName:"Suresh Trading Co (HUF)",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-3",FilingType:"Original",ReturnStatus:"PENDING_DOCS",AssignedStaffID:"USR003",InternalDueDate:"16-Oct-2026",StatutoryDueDate:"31-Oct-2026",TotalIncome:4500000,TaxPayable:625000,TaxPaid:625000,Refund:0,BalanceDue:0,ReturnNotes:"Business with books — audit applicable"},
+    {ReturnID:"RET004",ClientID:"CLI004",PAN:"DEFGH4567I",ClientName:"Anita Mehta",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-2",FilingType:"Original",ReturnStatus:"REVIEW_PENDING",AssignedStaffID:"USR002",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",TotalIncome:320000,TaxPayable:0,TaxPaid:15000,Refund:15000,BalanceDue:0,ReturnNotes:"NRI — rental + FD interest"},
+    {ReturnID:"RET005",ClientID:"CLI005",PAN:"EFGHI5678J",ClientName:"Dr. Vikram Patel",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-4",FilingType:"Original",ReturnStatus:"PENDING_DOCS",AssignedStaffID:"USR003",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",TotalIncome:0,TaxPayable:0,TaxPaid:0,Refund:0,BalanceDue:0,ReturnNotes:"Doctor — presumptive 44ADA"},
+    {ReturnID:"RET006",ClientID:"CLI006",PAN:"FGHIJ6789K",ClientName:"Lakshmi Constructions Pvt Ltd",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-6",FilingType:"Original",ReturnStatus:"PENDING_DOCS",AssignedStaffID:"USR002",InternalDueDate:"16-Oct-2026",StatutoryDueDate:"31-Oct-2026",TotalIncome:0,TaxPayable:0,TaxPaid:0,Refund:0,BalanceDue:0,ReturnNotes:"Company — audit — Oct deadline"},
+    {ReturnID:"RET007",ClientID:"CLI007",PAN:"GHIJK7890L",ClientName:"Mohammed Ali Sheikh",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-4",FilingType:"Original",ReturnStatus:"FILED",AssignedStaffID:"USR003",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",ActualFilingDate:"03-May-2026",AcknowledgmentNo:"123456781234567",TotalIncome:1100000,TaxPayable:78000,TaxPaid:78000,Refund:0,BalanceDue:0,ReturnNotes:"Retail trader — presumptive"},
+    {ReturnID:"RET008",ClientID:"CLI008",PAN:"HIJKL8901M",ClientName:"Deepa Krishnamurthy",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-2",FilingType:"Original",ReturnStatus:"CLIENT_APPROVAL_PENDING",AssignedStaffID:"USR002",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",TotalIncome:2200000,TaxPayable:195000,TaxPaid:195000,Refund:0,BalanceDue:0,ReturnNotes:"IT professional — ESOPs"},
+    {ReturnID:"RET009",ClientID:"CLI009",PAN:"IJKLM9012N",ClientName:"Gurpreet Singh Bedi",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-1",FilingType:"Original",ReturnStatus:"COMPLETED",AssignedStaffID:"USR003",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",ActualFilingDate:"28-Apr-2026",AcknowledgmentNo:"987654321234567",TotalIncome:680000,TaxPayable:32500,TaxPaid:32500,Refund:0,BalanceDue:0,ReturnNotes:"Agriculture + salary"},
+    {ReturnID:"RET010",ClientID:"CLI010",PAN:"JKLMN0123O",ClientName:"Sunita Agarwal",AY:"AY 2026-27",FY:"FY 2025-26",ITRFormType:"ITR-1",FilingType:"Original",ReturnStatus:"ACKNOWLEDGED",AssignedStaffID:"USR002",InternalDueDate:"16-Jul-2026",StatutoryDueDate:"31-Jul-2026",ActualFilingDate:"01-May-2026",AcknowledgmentNo:"112233445566778",TotalIncome:540000,TaxPayable:0,TaxPaid:0,Refund:2000,BalanceDue:0,ReturnNotes:"Govt employee"}
+  ],
+  dashboardStats:{totalClients:10,totalReturns:10,filed:3,filedPct:30,overdueCount:0,statusCounts:{PENDING_DOCS:3,DOCS_RECEIVED:1,IN_PREPARATION:1,REVIEW_PENDING:1,CLIENT_APPROVAL_PENDING:1,FILED:1,ACKNOWLEDGED:1,COMPLETED:1},totalRefund:17000,totalTaxPaid:1070000,revenue:{totalInvoiced:48500,totalCollected:32000,outstanding:16500},alertCount:3,criticalAlerts:0,complianceScore:72,formDistribution:{"ITR-1":3,"ITR-2":3,"ITR-3":1,"ITR-4":2,"ITR-6":1},staffWorkload:[{staffId:"USR002",clients:6,pendingReturns:4,completedReturns:2},{staffId:"USR003",clients:4,pendingReturns:2,completedReturns:2}]}
+};
+
+/* ═══════════════════════════════════════════════════════
+   DEMO HELPERS
+═══════════════════════════════════════════════════════ */
+function getDemoCalendar(){return[
+  {id:"E1",ay:"AY 2026-27",type:"ITR_INDIVIDUAL",description:"ITR Filing Deadline (Individual/HUF) — AY 2026-27",date:"31-Jul-2026",daysLeft:86,urgency:"normal",penalty:"₹5,000 u/s 234F"},
+  {id:"E2",ay:"AY 2026-27",type:"ITR_AUDIT",description:"ITR Filing Deadline (Audit Cases) — AY 2026-27",date:"31-Oct-2026",daysLeft:178,urgency:"normal",penalty:"₹5,000 u/s 234F"},
+  {id:"E3",ay:"AY 2026-27",type:"ADVANCE_TAX_Q1",description:"Advance Tax — 1st Installment (15%)",date:"15-Jun-2026",daysLeft:40,urgency:"warning",penalty:"1% pm u/s 234C"},
+  {id:"E4",ay:"AY 2026-27",type:"ADVANCE_TAX_Q2",description:"Advance Tax — 2nd Installment (45%)",date:"15-Sep-2026",daysLeft:132,urgency:"normal",penalty:"1% pm u/s 234C"},
+  {id:"E5",ay:"AY 2025-26",type:"ITR_BELATED",description:"Belated Return Deadline — AY 2025-26",date:"31-Dec-2025",daysLeft:-126,urgency:"overdue",penalty:"₹5,000 + 234F"},
+  {id:"E6",ay:"AY 2026-27",type:"ITR_REVISED",description:"Revised Return Deadline — AY 2026-27",date:"31-Dec-2026",daysLeft:239,urgency:"normal",penalty:"Cannot revise after"}
+];}
+function getDemoAlerts(){return[
+  {type:"DOCS_PENDING",returnId:"RET003",clientName:"Suresh Trading Co (HUF)",pan:"CDEFG3456H",ay:"AY 2026-27",message:"Documents not received — deadline approaching",priority:"High"},
+  {type:"DOCS_PENDING",returnId:"RET005",clientName:"Dr. Vikram Patel",pan:"EFGHI5678J",ay:"AY 2026-27",message:"Documents not received — deadline approaching",priority:"High"},
+  {type:"WARNING",returnId:"RET002",clientName:"Priya Nair",pan:"BCDEF2345G",ay:"AY 2026-27",daysLeft:86,message:"Due in 86 days",priority:"Medium"}
+];}
+function getDemoInvoices(){return[
+  {InvoiceID:"INV001",InvoiceNo:"ITRF/2627/202605/0001",ClientName:"Rajesh Kumar Sharma",AY:"AY 2026-27",InvoiceDate:"03-May-2026",ITRFormType:"ITR-1",BaseAmount:1200,IGST:0,CGST:108,SGST:108,TotalAmount:1416,PaymentStatus:"Paid",PaymentDate:"04-May-2026",PaymentMode:"UPI"},
+  {InvoiceID:"INV002",InvoiceNo:"ITRF/2627/202605/0002",ClientName:"Mohammed Ali Sheikh",AY:"AY 2026-27",InvoiceDate:"03-May-2026",ITRFormType:"ITR-4",BaseAmount:1500,IGST:0,CGST:135,SGST:135,TotalAmount:1770,PaymentStatus:"Paid",PaymentDate:"04-May-2026",PaymentMode:"Bank Transfer"},
+  {InvoiceID:"INV003",InvoiceNo:"ITRF/2627/202605/0003",ClientName:"Sunita Agarwal",AY:"AY 2026-27",InvoiceDate:"01-May-2026",ITRFormType:"ITR-1",BaseAmount:800,IGST:0,CGST:72,SGST:72,TotalAmount:944,PaymentStatus:"Paid",PaymentDate:"02-May-2026",PaymentMode:"UPI"},
+  {InvoiceID:"INV004",InvoiceNo:"ITRF/2627/202605/0004",ClientName:"Deepa Krishnamurthy",AY:"AY 2026-27",InvoiceDate:"04-May-2026",ITRFormType:"ITR-2",BaseAmount:2000,IGST:0,CGST:180,SGST:180,TotalAmount:2360,PaymentStatus:"Unpaid"},
+  {InvoiceID:"INV005",InvoiceNo:"ITRF/2627/202605/0005",ClientName:"Anita Mehta",AY:"AY 2026-27",InvoiceDate:"04-May-2026",ITRFormType:"ITR-2",BaseAmount:2500,IGST:450,CGST:0,SGST:0,TotalAmount:2950,PaymentStatus:"Unpaid"}
+];}
+function getDemoNotifications(){return[
+  {NotifID:"N1",Subject:"Documents Pending: Suresh Trading Co",Message:"Docs not received for AY 2026-27",Priority:"High",Status:"Pending",AY:"AY 2026-27"},
+  {NotifID:"N2",Subject:"Advance Tax Q1 Due: 15-Jun-2026",Message:"Remind clients to pay 15% advance tax",Priority:"Medium",Status:"Pending",AY:"AY 2026-27"},
+  {NotifID:"N3",Subject:"Return Reviewed: Deepa Krishnamurthy",Message:"Client approval pending for ITR-2",Priority:"Medium",Status:"Pending",AY:"AY 2026-27"}
+];}
+function getDemoRegimeComparison(d){
+  const g=parseFloat(d.grossTotal)||0,c80=Math.min(parseFloat(d.chapterVIA)||0,150000);
+  const oT=Math.max(0,g-50000-c80),nT=Math.max(0,g-75000);
+  const oTax=computeTaxFE(oT,"Old"),nTax=computeTaxFE(nT,"New");
+  const saving=Math.abs(oTax-nTax),rec=nTax<=oTax?"New":"Old";
+  return{ay:d.ay||"AY 2026-27",grossTotal:g,oldRegime:{taxableIncome:oT,withHEC:oTax,stdDeduction:50000,deductions:c80},newRegime:{taxableIncome:nT,withHEC:nTax,stdDeduction:75000},saving,savingIn:rec+" Regime",recommended:rec,breakeven:350000,summary:`${rec} Regime saves ₹${saving.toLocaleString("en-IN")} for this profile`};
+}
+function computeTaxFE(income,regime){
+  const sl=regime==="New"?[[0,300000,0],[300001,700000,5],[700001,1000000,10],[1000001,1200000,15],[1200001,1500000,20],[1500001,Infinity,30]]:[[0,250000,0],[250001,500000,5],[500001,1000000,20],[1000001,Infinity,30]];
+  let t=0;sl.forEach(([f,to,r])=>{if(income>f)t+=(Math.min(income,to)-f)*r/100;});
+  const rl=regime==="New"?700000:500000;if(income<=rl)return 0;return Math.round(t*1.04);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STORE
+═══════════════════════════════════════════════════════ */
+const Store={state:{currentAY:"AY 2026-27",currentUser:null,activeModule:"dashboard",loading:false},get(k){return this.state[k];},set(k,v){this.state[k]=v;(this.listeners[k]||[]).forEach(cb=>cb(v));},listeners:{},on(k,cb){this.listeners[k]=this.listeners[k]||[];this.listeners[k].push(cb);}};
+
+/* ═══════════════════════════════════════════════════════
+   API
+═══════════════════════════════════════════════════════ */
+const API={
+  async call(action,data={}){
+    if(CONFIG.DEMO_MODE||!CONFIG.GAS_URL||CONFIG.GAS_URL.includes("YOUR_DEPLOYED"))return this.demoCall(action,data);
+    const token=sessionStorage.getItem("itr_token");
+    const res=await fetch(CONFIG.GAS_URL,{method:"POST",mode:"cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action,data,token})});
+    const r=await res.json();if(!r.success)throw new Error(r.error||"API Error");return r.data;
+  },
+  demoCall(action,data){
+    return new Promise(resolve=>{setTimeout(()=>{
+      switch(action){
+        case"getSystemAY":resolve(DEMO_DATA.systemAY);break;
+        case"getDashboardStats":resolve(DEMO_DATA.dashboardStats);break;
+        case"getClients":resolve({clients:DEMO_DATA.clients,total:DEMO_DATA.clients.length,page:1,pageSize:25,totalPages:1});break;
+        case"getReturns":{let r=DEMO_DATA.returns;if(data.ay)r=r.filter(x=>x.AY===data.ay);if(data.status)r=r.filter(x=>x.ReturnStatus===data.status);if(data.itrForm)r=r.filter(x=>x.ITRFormType===data.itrForm);if(data.search){const q=data.search.toLowerCase();r=r.filter(x=>x.ClientName.toLowerCase().includes(q)||x.PAN.toLowerCase().includes(q));}resolve({returns:r,total:r.length});break;}
+        case"getCalendar":resolve(getDemoCalendar());break;
+        case"getPendingAlerts":resolve(getDemoAlerts());break;
+        case"getInvoices":resolve({invoices:getDemoInvoices(),total:5});break;
+        case"getRegimeComparison":resolve(getDemoRegimeComparison(data));break;
+        case"login":resolve({success:true,data:{token:"demo_"+Date.now(),userId:"USR001",userName:"CA Sharma (Demo)",role:"SuperAdmin",email:"admin@itrfirm.com"}});break;
+        case"getNotifications":resolve(getDemoNotifications());break;
+        case"importFromJSON":try{const j=JSON.parse(data.jsonString||"{}");const p=j.ITR?.ITR1?.PersonalInfo||j.ITR?.ITR2?.PersonalInfo||{};resolve({success:true,extracted:{PAN:p.PAN||"",FullName:((p.AssesseeName?.SurNameOrOrgName||"")+" "+(p.AssesseeName?.FirstName||"")).trim(),DateOfBirth:p.DOB||"",MobileNo:p.MobileNo||"",Email:p.EmailAddress||"",GrossTotal:j.ITR?.ITR1?.ITR1_IncomeDeductions?.GrossTotIncome||0},rawFieldCount:12,formType:"ITR-1"});}catch(e){resolve({success:false,error:"Invalid JSON: "+e.message});}break;
+        default:resolve({success:true,message:"Demo: "+action});
+      }
+    },250+Math.random()*150);});
+  }
+};
+
+/* ═══════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════ */
+const Auth={
+  async login(e){
+    e.preventDefault();
+    const email=document.getElementById("login-email").value,pass=document.getElementById("login-pass").value;
+    const btn=document.getElementById("login-btn"),err=document.getElementById("login-err");
+    btn.disabled=true;document.getElementById("login-btn-text").textContent="Signing in...";err.style.display="none";
+    try{
+      const result=await API.call("login",{email,password:pass});
+      const u=result.data||result;
+      sessionStorage.setItem("itr_token",u.token);sessionStorage.setItem("itr_user",JSON.stringify(u));
+      document.getElementById("login-screen").style.display="none";
+      document.getElementById("app").style.display="flex";
+      Store.set("currentUser",u);
+      document.getElementById("user-name-display").textContent=u.userName;
+      document.getElementById("user-role-display").textContent=u.role;
+      document.getElementById("user-avatar").textContent=(u.userName||"A").charAt(0).toUpperCase();
+      await AppInit.init();
+    }catch(ex){err.style.display="block";err.textContent="Invalid credentials. Try admin@itrfirm.com / Admin@123";}
+    finally{btn.disabled=false;document.getElementById("login-btn-text").textContent="Sign In";}
+  },
+  logout(){if(!confirm("Logout from ITR Filing ERP?"))return;sessionStorage.clear();document.getElementById("app").style.display="none";document.getElementById("login-screen").style.display="flex";},
+  checkSession(){const u=sessionStorage.getItem("itr_user");if(!u)return false;const d=JSON.parse(u);Store.set("currentUser",d);document.getElementById("user-name-display").textContent=d.userName;document.getElementById("user-role-display").textContent=d.role;document.getElementById("user-avatar").textContent=(d.userName||"A").charAt(0).toUpperCase();document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="flex";return true;}
+};
+
+/* ═══════════════════════════════════════════════════════
+   AY MANAGER
+═══════════════════════════════════════════════════════ */
+const AYManager={
+  ayData:null,
+  async init(){
+    try{this.ayData=await API.call("getSystemAY");}catch(e){this.ayData=DEMO_DATA.systemAY;}
+    this.updateUI(this.ayData);
+  },
+  updateUI(d){
+    Store.set("currentAY",d.ayLabel);
+    document.getElementById("sb-ay-label").textContent=d.ayLabel;
+    document.getElementById("header-date").textContent=d.currentDate;
+    const pm={AY_JUST_OPENED:{label:"🎉 AY Just Opened",cls:"opened"},PRIMARY_FILING:{label:"Primary Filing",cls:"primary"},EXTENDED_FILING:{label:"Extended Filing",cls:"extended"},REVISED_RETURN_PERIOD:{label:"Revised Returns",cls:"revised"}};
+    const p=pm[d.filingPhase]||pm.PRIMARY_FILING;
+    document.getElementById("sb-phase-badge").textContent=p.label;
+    document.getElementById("sb-phase-badge").className="phase-badge "+p.cls;
+    document.getElementById("header-phase-badge").textContent=p.label;
+    const sel=document.getElementById("ay-selector");
+    if(sel&&d.supportedAYs){sel.innerHTML=d.supportedAYs.map(a=>`<option value="${a}"${a===d.ayLabel?" selected":""}>${a}</option>`).join("");}
+    if(d.isAYOpenDay)this.showBanner(d.ayLabel);
+  },
+  setAY(ay){Store.set("currentAY",ay);Router.navigate(Store.get("activeModule"));},
+  showBanner(ay){const b=document.createElement("div");b.className="ay-banner";b.innerHTML=`<div style="font-size:32px">🎉</div><div><div style="font-weight:700;color:var(--accent);font-size:15px">New AY ${ay} is Open!</div><div style="font-size:13px;color:var(--text2)">All client return records auto-initialized.</div></div><button class="btn btn-ghost btn-xs" style="margin-left:auto" onclick="this.parentElement.remove()">✕</button>`;document.getElementById("content").prepend(b);}
+};
+
+/* ═══════════════════════════════════════════════════════
+   ROUTER
+═══════════════════════════════════════════════════════ */
+const MODULE_TITLES={dashboard:"Dashboard",clients:"Client Management",returns:"Return Register",compliance:"Compliance Calendar",invoices:"Invoice Management","tax-engine":"Tax Analyzer",regime:"Regime Comparison",reports:"Reports & Analytics",audit:"Audit Trail",settings:"Settings"};
+const Router={
+  navigate(route){
+    Store.set("activeModule",route);
+    document.getElementById("module-title").textContent=MODULE_TITLES[route]||route;
+    document.querySelectorAll(".nav-item").forEach(el=>el.classList.toggle("active",el.dataset.route===route));
+    document.getElementById("content").innerHTML=`<div class="flex items-center" style="height:200px;justify-content:center"><div class="loading-spinner" style="width:32px;height:32px;border-width:3px"></div></div>`;
+    const map={dashboard:()=>DashboardModule.render(),clients:()=>ClientModule.render(),returns:()=>ReturnModule.render(),compliance:()=>ComplianceModule.render(),invoices:()=>InvoiceModule.render(),"tax-engine":()=>TaxEngineModule.render(),regime:()=>RegimeModule.render(),reports:()=>ReportModule.render(),audit:()=>AuditModule.render(),settings:()=>SettingsModule.render()};
+    const fn=map[route];if(fn)fn();else document.getElementById("content").innerHTML=`<div class="empty-state"><div class="empty-title">Module Coming Soon</div></div>`;
+  }
+};
+
+/* ═══════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════ */
+const Modal={
+  open(title,body,footer,large=false){
+    document.getElementById("modal-title").textContent=title;
+    document.getElementById("modal-body").innerHTML=body;
+    document.getElementById("modal-footer").innerHTML=footer||"";
+    document.getElementById("modal-box").className=large?"modal modal-lg":"modal";
+    document.getElementById("modal-overlay").classList.add("open");
+  },
+  close(){document.getElementById("modal-overlay").classList.remove("open");},
+  closeOnOverlay(e){if(e.target===document.getElementById("modal-overlay"))this.close();}
+};
+
+/* ═══════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════ */
+function toast(msg,type="info",ms=3500){
+  const ic={success:"✅",error:"❌",warning:"⚠️",info:"ℹ️"};
+  const el=document.createElement("div");el.className="toast "+type;
+  el.innerHTML=`<span>${ic[type]||""}</span><span>${msg}</span>`;
+  document.getElementById("toast-container").appendChild(el);
+  setTimeout(()=>{el.style.cssText+="opacity:0;transform:translateX(100%);transition:all .3s";setTimeout(()=>el.remove(),300);},ms);
+}
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+function fmtINR(n){return"₹"+(parseFloat(n)||0).toLocaleString("en-IN");}
+function fmtDate(d){if(!d)return"—";if(typeof d==="string"&&/\d{2}-[A-Za-z]{3}-\d{4}/.test(d))return d;const dt=new Date(d);if(isNaN(dt))return d;const m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return`${String(dt.getDate()).padStart(2,"0")}-${m[dt.getMonth()]}-${dt.getFullYear()}`;}
+function daysLeft(s){if(!s)return null;const d=new Date(s.replace(/(\d{2})-([A-Za-z]{3})-(\d{4})/,"$1 $2 $3"));return isNaN(d)?null:Math.ceil((d-new Date())/(864e5));}
+function daysChip(dateStr,status){if(["FILED","ACKNOWLEDGED","COMPLETED"].includes(status))return`<span class="days-chip ok">✓ Filed</span>`;const d=daysLeft(dateStr);if(d===null)return"—";if(d<0)return`<span class="days-chip overdue">Overdue ${Math.abs(d)}d</span>`;if(d<=7)return`<span class="days-chip danger">${d}d left</span>`;if(d<=30)return`<span class="days-chip warn">${d}d left</span>`;return`<span class="days-chip ok">${d}d left</span>`;}
+function statusBadge(s){const c=STATUS_CONFIG[s]||{label:s,cls:"badge-pending"};return`<span class="badge ${c.cls}">${c.label}</span>`;}
+function itrTag(f){if(!f)return"—";const cls=f.toLowerCase().replace(/-/g,"_");return`<span class="itr-tag ${cls}">${f}</span>`;}
+function panDisplay(p){return`<span class="pan-text">${p||"—"}</span>`;}
+function infoRow(label,val){return`<div style="display:flex;gap:8px;font-size:13px;margin-bottom:4px"><span style="color:var(--text3);width:120px;flex-shrink:0">${label}</span><span style="font-weight:500">${val||"—"}</span></div>`;}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
+
+/* ═══════════════════════════════════════════════════════
+   NOTIFICATION MANAGER
+═══════════════════════════════════════════════════════ */
+const NotifManager={
+  notifs:[],
+  async load(){try{this.notifs=await API.call("getNotifications",{});}catch(e){this.notifs=getDemoNotifications();}this.updateBadge();this.renderList();},
+  updateBadge(){const n=this.notifs.filter(x=>x.Status==="Pending").length;const b=document.getElementById("notif-count"),a=document.getElementById("alert-count");if(n>0){b.style.display="flex";b.textContent=n;a.style.display="flex";a.textContent=n;}else{b.style.display="none";a.style.display="none";}},
+  renderList(){const l=document.getElementById("notif-list");if(!this.notifs.length){l.innerHTML=`<div class="empty-state" style="padding:32px"><div class="empty-title">No notifications</div></div>`;return;}const pc={Critical:"priority-critical",High:"priority-high",Medium:"priority-medium"};l.innerHTML=this.notifs.map(n=>`<div class="notif-item" onclick="NotifManager.markRead('${n.NotifID}')"><div class="notif-item-title"><span class="notif-priority-dot ${pc[n.Priority]||""}"></span>${n.Subject}</div><div class="notif-item-msg">${n.Message}</div><div class="notif-item-meta">${n.AY||""} · ${n.Priority}</div></div>`).join("");},
+  async markRead(id){await API.call("markNotifRead",{notifId:id}).catch(()=>{});this.notifs=this.notifs.filter(n=>n.NotifID!==id);this.updateBadge();this.renderList();},
+  markAllRead(){this.notifs=[];this.updateBadge();this.renderList();toggleNotifications();}
+};
+
+/* ═══════════════════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════════════════ */
+function toggleSidebar(){document.getElementById("sidebar").classList.toggle("collapsed");}
+function toggleTheme(){document.documentElement.dataset.theme=document.documentElement.dataset.theme==="light"?"":"light";}
+function toggleNotifications(){document.getElementById("notif-dropdown").classList.toggle("open");}
+document.addEventListener("click",e=>{if(!document.getElementById("notif-btn").contains(e.target)&&!document.getElementById("notif-dropdown").contains(e.target))document.getElementById("notif-dropdown").classList.remove("open");});
+
+function buildClientForm(c={}){return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <div class="form-group"><label class="form-label">PAN *</label><input class="form-input" id="cf-pan" value="${c.PAN||""}" placeholder="ABCDE1234F" style="text-transform:uppercase" maxlength="10"></div>
+  <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="cf-name" value="${c.FullName||""}" placeholder="As per PAN card"></div>
+  <div class="form-group"><label class="form-label">Entity Type</label><select class="form-select" id="cf-entity">${["Individual","HUF","Firm","Company","LLP","AOP","BOI"].map(e=>`<option${c.EntityType===e?" selected":""}>${e}</option>`).join("")}</select></div>
+  <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="cf-cat">${["Salaried","Business","Professional","Capital_Gains","Multiple"].map(e=>`<option${c.ClientCategory===e?" selected":""}>${e}</option>`).join("")}</select></div>
+  <div class="form-group"><label class="form-label">Mobile *</label><input class="form-input" id="cf-mobile" value="${c.MobileNo||""}" placeholder="10-digit mobile" maxlength="10"></div>
+  <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cf-email" type="email" value="${c.Email||""}" placeholder="email@domain.com"></div>
+  <div class="form-group"><label class="form-label">City</label><input class="form-input" value="${c.City||""}" placeholder="City"></div>
+  <div class="form-group"><label class="form-label">State</label><input class="form-input" value="${c.State||""}" placeholder="State"></div>
+  <div class="form-group"><label class="form-label">Residential Status</label><select class="form-select">${["Resident","NRI","RNOR"].map(e=>`<option${c.ResidentialStatus===e?" selected":""}>${e}</option>`).join("")}</select></div>
+  <div class="form-group"><label class="form-label">Preferred Regime</label><select class="form-select"><option${c.PreferredRegime==="New"?" selected":""}>New</option><option${c.PreferredRegime==="Old"?" selected":""}>Old</option></select></div>
+  <div class="form-group" style="grid-column:1/-1"><label class="form-label">Notes</label><textarea class="form-textarea" rows="2" placeholder="Any notes...">${c.Notes||""}</textarea></div>
+</div>`;}
+
+function buildSettingField(label,key,value,type="text"){return`<div class="form-group"><label class="form-label">${label}</label><input class="form-input" id="sf-${key}" type="${type}" value="${value}"></div>`;}
+function switchProfileTab(el,tabId){document.querySelectorAll("#profile-tabs .tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");["tab-overview","tab-returns","tab-notes"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=id===tabId?"block":"none";});}
+function switchTaxTab(el,tabId){document.querySelectorAll("#tax-tabs .tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");["tax-26as","tax-form16","tax-whatif","tax-suggest"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=id===tabId?"block":"none";});}
+function switchRepTab(el,tabId){document.querySelectorAll("#rep-tabs .tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");["rep-compliance","rep-revenue","rep-staff"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=id===tabId?"block":"none";});}
+function switchSetTab(el,tabId){document.querySelectorAll("#set-tabs .tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");["set-firm","set-ay","set-fees","set-users","set-notifs"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=id===tabId?"block":"none";});}
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD MODULE  (render entry — body in PART-2)
+═══════════════════════════════════════════════════════ */
+const DashboardModule={
+  async render(){
+    try{
+      const[stats,alerts]=await Promise.all([API.call("getDashboardStats",{ay:Store.get("currentAY")}),API.call("getPendingAlerts",{})]);
+      this.renderStats(stats,alerts);
+    }catch(e){this.renderStats(DEMO_DATA.dashboardStats,getDemoAlerts());}
+  },
+erts());
+    }
+  },
+
+  renderStats(stats, alerts) {
+    const sc = stats.statusCounts || {};
+    const score = stats.complianceScore || 0;
+    const scoreColor = score >= 80 ? "var(--success)" : score >= 60 ? "var(--warning)" : "var(--danger)";
+
+    document.getElementById("content").innerHTML = `
+    <div class="grid-4 mb-16">
+      <div class="kpi-card green">
+        <div class="kpi-label">Total Clients</div>
+        <div class="kpi-value">${stats.totalClients}</div>
+        <div class="kpi-sub">Active this AY</div>
+        <svg class="kpi-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Returns Filed</div>
+        <div class="kpi-value">${stats.filed}/${stats.totalReturns}</div>
+        <div class="kpi-sub"><span class="progress-bar" style="display:inline-block;width:80px;vertical-align:middle"><span class="progress-fill orange" style="width:${stats.filedPct}%"></span></span> ${stats.filedPct}% done</div>
+        <svg class="kpi-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="kpi-card ${stats.overdueCount > 0 ? 'red' : 'blue'}">
+        <div class="kpi-label">Pending Returns</div>
+        <div class="kpi-value">${stats.totalReturns - stats.filed}</div>
+        <div class="kpi-sub">${stats.overdueCount > 0 ? `<span class="text-danger">⚠ ${stats.overdueCount} overdue</span>` : `${(alerts||[]).filter(a=>a.priority==="High").length} high priority`}</div>
+        <svg class="kpi-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Refunds Due</div>
+        <div class="kpi-value" style="font-size:22px">${fmtINR(stats.totalRefund)}</div>
+        <div class="kpi-sub">Revenue collected: ${fmtINR(stats.revenue?.totalCollected||0)}</div>
+        <svg class="kpi-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 260px 280px;gap:16px;margin-bottom:16px">
+      <!-- Donut Chart -->
+      <div class="card">
+        <div class="section-header"><div class="section-title">Return Status Distribution</div><span class="text-muted text-sm">${Store.get("currentAY")}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
+          <div class="chart-container"><canvas id="status-donut"></canvas></div>
+          <div id="status-legend"></div>
+        </div>
+      </div>
+      <!-- Gauge -->
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+        <div class="section-title" style="margin-bottom:8px">Compliance Score</div>
+        <canvas id="gauge-chart" width="180" height="100"></canvas>
+        <div class="gauge-score" style="color:${scoreColor}">${score}</div>
+        <div class="gauge-label">${score>=80?"Excellent":score>=60?"Good":"Needs Attention"}</div>
+        <div class="text-xs text-muted" style="text-align:center;margin-top:4px">Based on filing rate,<br>docs receipt &amp; deadlines</div>
+      </div>
+      <!-- Upcoming Deadlines -->
+      <div class="card">
+        <div class="section-header"><div class="section-title">Upcoming Deadlines</div><button class="btn btn-ghost btn-xs" onclick="Router.navigate('compliance')">View all →</button></div>
+        <div id="deadline-list"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
+      <!-- Returns Table -->
+      <div class="card" style="overflow:hidden;padding:0">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div class="section-title">Returns — ${Store.get("currentAY")}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-box">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="form-input" id="dash-search" placeholder="Search clients..." style="min-width:180px" oninput="DashboardModule.filterTable(this.value)">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="ReturnModule.openCreate()">+ New Return</button>
+          </div>
+        </div>
+        <div class="table-wrap" id="dash-table-wrap"></div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span class="text-xs text-muted" id="dash-table-info">Showing all returns</span>
+          <button class="btn btn-ghost btn-xs" onclick="Router.navigate('returns')">View full register →</button>
+        </div>
+      </div>
+      <!-- Activity Feed -->
+      <div class="card" style="overflow:hidden;padding:0">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div class="section-title">Recent Activity</div>
+        </div>
+        <div id="activity-feed" style="padding:8px 16px;overflow-y:auto;max-height:420px"></div>
+      </div>
+    </div>
+
+    <!-- Staff Workload -->
+    <div class="card mt-16">
+      <div class="section-header"><div class="section-title">Staff Workload — ${Store.get("currentAY")}</div></div>
+      <div id="staff-workload" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"></div>
+    </div>`;
+
+    this._stats = stats;
+    this._alerts = alerts || [];
+    this.renderCharts(stats);
+    this.renderDeadlines();
+    this.renderTable(DEMO_DATA.returns);
+    this.renderActivity();
+    this.renderWorkload(stats.staffWorkload || []);
+  },
+
+  renderCharts(stats) {
+    const sc = stats.statusCounts || {};
+    const labels = Object.keys(sc).filter(k => sc[k] > 0);
+    const vals   = labels.map(k => sc[k]);
+    const colorMap = {
+      PENDING_DOCS:"#64748B", DOCS_RECEIVED:"#F59E0B", IN_PREPARATION:"#3B82F6",
+      REVIEW_PENDING:"#8B5CF6", CLIENT_APPROVAL_PENDING:"#F97316", FILED:"#10B981",
+      ACKNOWLEDGED:"#34D399", COMPLETED:"#6EE7B7", DEFECTIVE:"#EF4444", REVISED_NEEDED:"#FCA5A5"
+    };
+    const colors = labels.map(k => colorMap[k] || "#64748B");
+
+    const ctx = document.getElementById("status-donut").getContext("2d");
+    new Chart(ctx, {
+      type: "doughnut",
+      data: { labels: labels.map(l => STATUS_CONFIG[l]?.label || l), datasets: [{ data: vals, backgroundColor: colors, borderWidth: 2, borderColor: "var(--surface)" }] },
+      options: { responsive: true, maintainAspectRatio: true, cutout: "68%",
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw}` } } } }
+    });
+
+    const legend = document.getElementById("status-legend");
+    legend.innerHTML = labels.map((k,i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer" onclick="Router.navigate('returns')">
+        <span style="width:10px;height:10px;border-radius:3px;background:${colors[i]};flex-shrink:0"></span>
+        <span style="font-size:12px;color:var(--text2);flex:1">${STATUS_CONFIG[k]?.label||k}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)">${vals[i]}</span>
+      </div>`).join("");
+
+    // Gauge
+    const gc = document.getElementById("gauge-chart").getContext("2d");
+    const score = stats.complianceScore || 0;
+    const pct = score / 100;
+    const startAngle = Math.PI;
+    const endAngle = Math.PI + Math.PI * pct;
+    const trackColor = "rgba(255,255,255,0.06)";
+    const fillColor = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "#EF4444";
+    gc.clearRect(0,0,180,100);
+    gc.beginPath(); gc.arc(90,95,70,Math.PI,2*Math.PI); gc.lineWidth=12; gc.strokeStyle=trackColor; gc.stroke();
+    gc.beginPath(); gc.arc(90,95,70,startAngle,endAngle); gc.lineWidth=12; gc.strokeStyle=fillColor; gc.lineCap="round"; gc.stroke();
+  },
+
+  renderDeadlines() {
+    const list = document.getElementById("deadline-list");
+    const events = getDemoCalendar().filter(e => e.daysLeft > 0 && e.daysLeft <= 90).slice(0, 5);
+    if (!events.length) { list.innerHTML = `<div class="text-muted text-sm" style="padding:16px 0">No upcoming deadlines in 90 days</div>`; return; }
+    list.innerHTML = events.map(e => {
+      const color = e.daysLeft <= 7 ? "var(--danger)" : e.daysLeft <= 15 ? "var(--warning)" : "var(--success)";
+      return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="width:38px;height:38px;border-radius:8px;background:${color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;color:${color}">${e.daysLeft}d</div>
+        <div><div style="font-size:12.5px;font-weight:500">${e.description.split("—")[0].trim()}</div>
+        <div style="font-size:11px;color:var(--text3)">${e.date} · ${e.penalty}</div></div>
+      </div>`;
+    }).join("");
+  },
+
+  renderTable(returns) {
+    const wrap = document.getElementById("dash-table-wrap");
+    if (!returns.length) { wrap.innerHTML = `<div class="empty-state"><div class="empty-title">No returns found</div></div>`; return; }
+    wrap.innerHTML = `<table>
+      <thead><tr>
+        <th><input type="checkbox" id="select-all-cb" onchange="DashboardModule.toggleAll(this)"></th>
+        <th>Client</th><th>PAN</th><th>Form</th><th>Status</th>
+        <th>Staff</th><th>Due Date</th><th>Days Left</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${returns.map(r => {
+        const isOverdue = daysLeft(r.StatutoryDueDate) < 0 && !["FILED","ACKNOWLEDGED","COMPLETED"].includes(r.ReturnStatus);
+        return `<tr class="${isOverdue?"tr-overdue":""}">
+          <td><input type="checkbox" class="row-cb" data-id="${r.ReturnID}"></td>
+          <td style="font-weight:600">${r.ClientName}</td>
+          <td>${panDisplay(r.PAN)}</td>
+          <td>${itrTag(r.ITRFormType)}</td>
+          <td>${statusBadge(r.ReturnStatus)}</td>
+          <td style="font-size:12px">${r.AssignedStaffID||"—"}</td>
+          <td style="font-size:12px">${r.StatutoryDueDate||"—"}</td>
+          <td>${daysChip(r.StatutoryDueDate, r.ReturnStatus)}</td>
+          <td>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-ghost btn-xs" onclick="ReturnModule.openDetail('${r.ReturnID}')">View</button>
+              <button class="btn btn-ghost btn-xs" onclick="ReturnModule.openStatusUpdate('${r.ReturnID}','${r.ReturnStatus}')">Update</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table>`;
+    document.getElementById("dash-table-info").textContent = `Showing ${returns.length} return(s)`;
+  },
+
+  filterTable: debounce(function(q) {
+    const rows = (DEMO_DATA.returns || []).filter(r =>
+      !q || r.ClientName.toLowerCase().includes(q.toLowerCase()) || r.PAN.toLowerCase().includes(q.toLowerCase())
+    );
+    DashboardModule.renderTable(rows);
+  }, 300),
+
+  toggleAll(cb) {
+    document.querySelectorAll(".row-cb").forEach(c => c.checked = cb.checked);
+  },
+
+  renderActivity() {
+    const actions = [
+      {u:"CA",action:"Updated status",detail:"Rajesh Kumar Sharma → IN_PREPARATION",t:"2 min ago"},
+      {u:"KU",action:"Filed return",detail:"Mohammed Ali Sheikh — AY 2026-27 | Ack: 123456781234567",t:"1 hr ago"},
+      {u:"CA",action:"Completed return",detail:"Gurpreet Singh Bedi — AY 2026-27",t:"3 hrs ago"},
+      {u:"CA",action:"Created client",detail:"Deepa Krishnamurthy onboarded",t:"Yesterday"},
+      {u:"KU",action:"Generated invoice",detail:"INV002 — ₹1,770 for Mohammed Ali Sheikh",t:"Yesterday"},
+      {u:"CA",action:"Sent reminder",detail:"5 clients notified for document submission",t:"2 days ago"},
+      {u:"KU",action:"Docs received",detail:"Priya Nair — AY 2026-27 docs received",t:"2 days ago"}
+    ];
+    document.getElementById("activity-feed").innerHTML = actions.map(a => `
+      <div class="activity-item">
+        <div class="activity-avatar" style="background:rgba(249,115,22,0.15);color:var(--accent)">${a.u}</div>
+        <div><div class="activity-text"><strong>${a.action}</strong> — ${a.detail}</div>
+        <div class="activity-time">${a.t}</div></div>
+      </div>`).join("");
+  },
+
+  renderWorkload(workload) {
+    const staffNames = { USR002:"CA Sharma", USR003:"Staff Kumar", USR001:"SuperAdmin" };
+    document.getElementById("staff-workload").innerHTML = workload.map(w => {
+      const total = w.pendingReturns + w.completedReturns;
+      const pct = total > 0 ? Math.round(w.completedReturns / total * 100) : 0;
+      return `<div class="card-sm">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:600;font-size:13px">${staffNames[w.staffId]||w.staffId}</div>
+          <span class="badge badge-prep">${pct}%</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="text-xs text-muted">Clients<div style="font-weight:700;color:var(--text);font-size:15px">${w.clients}</div></div>
+          <div class="text-xs text-muted">Pending<div style="font-weight:700;color:var(--warning);font-size:15px">${w.pendingReturns}</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill orange" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join("");
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENT MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ClientModule = {
+  clients: [],
+  view: "table",
+
+  async render() {
+    document.getElementById("content").innerHTML = `
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="form-input" id="client-search" placeholder="Search by name, PAN, email..." oninput="ClientModule.search(this.value)">
+      </div>
+      <select class="form-select" style="width:140px" onchange="ClientModule.filter('entityType',this.value)">
+        <option value="">All Types</option>
+        <option>Individual</option><option>HUF</option><option>Firm</option>
+        <option>Company</option><option>LLP</option><option>AOP</option>
+      </select>
+      <select class="form-select" style="width:140px" onchange="ClientModule.filter('category',this.value)">
+        <option value="">All Categories</option>
+        <option>Salaried</option><option>Business</option><option>Professional</option>
+        <option>Capital_Gains</option><option>Multiple</option>
+      </select>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="ClientModule.openBulkImport()">📥 Bulk Import</button>
+        <button class="btn btn-secondary btn-sm" onclick="ClientModule.openJsonImport()">📄 JSON Import</button>
+        <button class="btn btn-primary btn-sm" onclick="ClientModule.openCreate()">+ Add Client</button>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <span class="text-xs text-muted" id="client-count">Loading...</span>
+        <div style="margin-left:auto;display:flex;gap:4px">
+          <button class="btn btn-ghost btn-xs ${this.view==='table'?'active':''}" onclick="ClientModule.setView('table')">☰ Table</button>
+          <button class="btn btn-ghost btn-xs ${this.view==='card'?'active':''}" onclick="ClientModule.setView('card')">⊞ Cards</button>
+        </div>
+      </div>
+      <div id="client-list-wrap"></div>
+      <div id="client-pagination" style="padding:12px 16px;border-top:1px solid var(--border)"></div>
+    </div>`;
+    await this.loadClients();
+  },
+
+  async loadClients(params = {}) {
+    try {
+      const res = await API.call("getClients", { ay: Store.get("currentAY"), pageSize: 25, ...params });
+      this.clients = res.clients || res;
+      this.renderList(this.clients);
+      document.getElementById("client-count").textContent = `${Array.isArray(res) ? res.length : res.total} clients`;
+    } catch(e) { this.clients = DEMO_DATA.clients; this.renderList(this.clients); document.getElementById("client-count").textContent = `${this.clients.length} clients`; }
+  },
+
+  renderList(clients) {
+    const wrap = document.getElementById("client-list-wrap");
+    if (!clients.length) { wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No clients found</div><div class="empty-desc">Add your first client to get started</div></div>`; return; }
+    if (this.view === "card") { this.renderCards(clients, wrap); return; }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr>
+        <th><input type="checkbox"></th>
+        <th>Client Name</th><th>PAN</th><th>Type</th><th>Category</th>
+        <th>Regime</th><th>City</th><th>Assigned To</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${clients.map(c => `<tr>
+        <td><input type="checkbox"></td>
+        <td>
+          <div style="font-weight:600">${c.FullName}</div>
+          <div class="text-xs text-muted">${c.Email||""}</div>
+        </td>
+        <td>${panDisplay(c.PAN)}</td>
+        <td><span class="badge badge-prep">${c.EntityType}</span></td>
+        <td><span style="font-size:12px">${c.ClientCategory||"—"}</span></td>
+        <td><span class="badge ${c.PreferredRegime==='New'?'badge-filed':'badge-docs'}">${c.PreferredRegime||"—"}</span></td>
+        <td style="font-size:12px">${c.City||"—"}</td>
+        <td style="font-size:12px">${c.AssignedStaffID||"—"}</td>
+        <td><span class="badge ${c.IsActive==="TRUE"||c.IsActive===true?'badge-filed':'badge-pending'}">${c.IsActive==="TRUE"||c.IsActive===true?"Active":"Inactive"}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-ghost btn-xs" onclick="ClientModule.openProfile('${c.ClientID}')">View</button>
+            <button class="btn btn-ghost btn-xs" onclick="ClientModule.openEdit('${c.ClientID}')">Edit</button>
+          </div>
+        </td>
+      </tr>`).join("")}</tbody>
+    </table></div>`;
+  },
+
+  renderCards(clients, wrap) {
+    wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:16px">
+      ${clients.map(c => `<div class="card-sm" style="cursor:pointer" onclick="ClientModule.openProfile('${c.ClientID}')">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;color:white;flex-shrink:0">${c.FullName.charAt(0)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.FullName}</div>
+            <div class="text-xs text-muted font-mono">${c.PAN}</div>
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="badge badge-prep">${c.EntityType}</span>
+              <span class="badge ${c.PreferredRegime==='New'?'badge-filed':'badge-docs'}">${c.PreferredRegime} Regime</span>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="text-xs text-muted">City<div style="color:var(--text);font-size:12px">${c.City||"—"}</div></div>
+          <div class="text-xs text-muted">Category<div style="color:var(--text);font-size:12px">${c.ClientCategory||"—"}</div></div>
+        </div>
+      </div>`).join("")}
+    </div>`;
+  },
+
+  setView(v) { this.view = v; this.renderList(this.clients); },
+  search: debounce(function(q) { ClientModule.loadClients({ search: q }); }, 300),
+  filter(key, val) { ClientModule.loadClients({ [key]: val }); },
+
+  openProfile(clientId) {
+    const client = DEMO_DATA.clients.find(c => c.ClientID === clientId) || {};
+    const returns = DEMO_DATA.returns.filter(r => r.ClientID === clientId);
+    Modal.open(`Client Profile — ${client.FullName}`, `
+      <div class="tabs" id="profile-tabs">
+        <div class="tab active" onclick="switchProfileTab(this,'tab-overview')">Overview</div>
+        <div class="tab" onclick="switchProfileTab(this,'tab-returns')">Returns (${returns.length})</div>
+        <div class="tab" onclick="switchProfileTab(this,'tab-notes')">Notes</div>
+      </div>
+      <div id="tab-overview">
+        <div class="grid-2 gap-16">
+          <div>
+            <div class="form-label mb-16">Identity</div>
+            <div style="display:grid;gap:8px">
+              ${infoRow("PAN", `<span class="pan-text">${client.PAN}</span>`)}
+              ${infoRow("Full Name", client.FullName)}
+              ${infoRow("Entity Type", client.EntityType)}
+              ${infoRow("Residential Status", client.ResidentialStatus)}
+              ${infoRow("Category", client.ClientCategory)}
+              ${infoRow("Preferred Regime", client.PreferredRegime)}
+            </div>
+          </div>
+          <div>
+            <div class="form-label mb-16">Contact</div>
+            <div style="display:grid;gap:8px">
+              ${infoRow("Mobile", client.MobileNo)}
+              ${infoRow("Email", client.Email)}
+              ${infoRow("City", client.City)}
+              ${infoRow("State", client.State)}
+              ${infoRow("Assigned Staff", client.AssignedStaffID)}
+              ${infoRow("Onboarded", client.OnboardingDate)}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-returns" style="display:none">
+        <div class="table-wrap"><table>
+          <thead><tr><th>AY</th><th>Form</th><th>Type</th><th>Status</th><th>Filed Date</th><th>Tax Paid</th></tr></thead>
+          <tbody>${returns.map(r=>`<tr>
+            <td>${r.AY}</td><td>${itrTag(r.ITRFormType)}</td><td>${r.FilingType}</td>
+            <td>${statusBadge(r.ReturnStatus)}</td>
+            <td>${r.ActualFilingDate||"—"}</td>
+            <td class="currency-sm">${fmtINR(r.TaxPaid)}</td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </div>
+      <div id="tab-notes" style="display:none">
+        <div class="form-group"><label class="form-label">Notes</label>
+        <textarea class="form-textarea" rows="5" placeholder="Add notes about this client...">${client.Notes||""}</textarea></div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Close</button>
+       <button class="btn btn-primary" onclick="ClientModule.openEdit('${clientId}');Modal.close()">Edit Client</button>`,
+      true
+    );
+  },
+
+  openCreate() {
+    Modal.open("Add New Client", buildClientForm({}),
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="ClientModule.submitCreate()">Create Client</button>`
+    );
+  },
+
+  openEdit(clientId) {
+    const client = DEMO_DATA.clients.find(c=>c.ClientID===clientId)||{};
+    Modal.open("Edit Client — " + client.FullName, buildClientForm(client),
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="ClientModule.submitEdit('${clientId}')">Save Changes</button>`
+    );
+  },
+
+  submitCreate() {
+    const pan = document.getElementById("cf-pan")?.value?.trim().toUpperCase();
+    if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) { toast("Invalid PAN format (e.g., ABCDE1234F)", "error"); return; }
+    toast("Client created successfully (Demo Mode)", "success");
+    Modal.close();
+  },
+
+  submitEdit(id) { toast("Client updated successfully (Demo Mode)", "success"); Modal.close(); },
+
+  openBulkImport() {
+    Modal.open("Bulk Import Clients", `
+      <div class="drop-zone" id="bulk-drop" onclick="document.getElementById('bulk-file').click()" 
+           ondragover="event.preventDefault();this.classList.add('dragover')" 
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="ClientModule.handleBulkDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px">📊</div>
+        <div style="font-weight:600;margin-bottom:4px">Drop Excel file here</div>
+        <div class="text-sm text-muted">or click to browse (.xlsx format)</div>
+        <input type="file" id="bulk-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ClientModule.handleBulkFile(this)">
+      </div>
+      <div class="mt-16">
+        <button class="btn btn-secondary btn-sm" onclick="ClientModule.downloadTemplate()">⬇ Download Template</button>
+        <span class="text-xs text-muted ml-auto">Required columns: PAN, FullName, MobileNo, Email, EntityType, ClientCategory</span>
+      </div>
+      <div id="bulk-preview" class="mt-16"></div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" id="bulk-import-btn" style="display:none" onclick="ClientModule.executeBulkImport()">Import Valid Rows</button>`
+    );
+  },
+
+  handleBulkDrop(e) {
+    e.preventDefault();
+    document.getElementById("bulk-drop").classList.remove("dragover");
+    toast("Bulk import — connect to GAS backend to process Excel files", "info");
+  },
+  handleBulkFile(input) { toast("Bulk import — connect to GAS backend to process Excel files", "info"); },
+  downloadTemplate() { toast("Template download — connect to GAS backend", "info"); },
+  executeBulkImport() { toast("Import executed (Demo Mode)", "success"); Modal.close(); },
+
+  openJsonImport() {
+    Modal.open("Import from ITR JSON", `
+      <div style="margin-bottom:12px;padding:10px 14px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;font-size:12px;color:var(--info)">
+        ℹ Upload the pre-filled ITR JSON downloaded from <strong>incometax.gov.in</strong>. The system will extract all available fields automatically.
+      </div>
+      <div class="drop-zone" id="json-drop" onclick="document.getElementById('json-file').click()"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="ClientModule.handleJsonDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px">📄</div>
+        <div style="font-weight:600;margin-bottom:4px">Drop ITR JSON file here</div>
+        <div class="text-sm text-muted">Supports ITR-1 through ITR-7 JSON schemas</div>
+        <input type="file" id="json-file" accept=".json" style="display:none" onchange="ClientModule.handleJsonFile(this)">
+      </div>
+      <div id="json-preview" class="mt-16"></div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" id="json-save-btn" style="display:none" onclick="ClientModule.saveFromJson()">Save to Master DB</button>`,
+      true
+    );
+  },
+
+  handleJsonDrop(e) {
+    e.preventDefault();
+    document.getElementById("json-drop").classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (file) this.processJsonFile(file);
+  },
+  handleJsonFile(input) { if (input.files[0]) this.processJsonFile(input.files[0]); },
+  processJsonFile(file) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const result = await API.call("importFromJSON", { jsonString: e.target.result });
+        if (result.success !== false) {
+          const ex = result.extracted || {};
+          document.getElementById("json-preview").innerHTML = `
+            <div class="section-title mb-16" style="font-size:14px">Extracted Fields — Review &amp; Edit</div>
+            <div class="grid-2 gap-16">
+              ${buildExtractedField("PAN", ex.PAN||"")}
+              ${buildExtractedField("Full Name", ex.FullName||"")}
+              ${buildExtractedField("Date of Birth", ex.DateOfBirth||"")}
+              ${buildExtractedField("Mobile", ex.MobileNo||"")}
+              ${buildExtractedField("Email", ex.Email||"")}
+              ${buildExtractedField("City", ex.address?.city||ex.City||"")}
+              ${buildExtractedField("State", ex.address?.state||ex.State||"")}
+              ${buildExtractedField("Gross Total Income", ex.GrossTotal?"₹"+Number(ex.GrossTotal).toLocaleString("en-IN"):"")}
+              ${buildExtractedField("Tax Payable", ex.TotalTaxPayable?"₹"+Number(ex.TotalTaxPayable).toLocaleString("en-IN"):"")}
+              ${buildExtractedField("Refund", ex.Refund?"₹"+Number(ex.Refund).toLocaleString("en-IN"):"")}
+            </div>
+            <div class="mt-16 text-xs text-muted">${result.rawFieldCount||0} fields extracted from ${result.formType||"ITR JSON"}</div>`;
+          document.getElementById("json-save-btn").style.display = "inline-flex";
+        }
+      } catch(err) { toast("Failed to parse JSON: " + err.message, "error"); }
+    };
+    reader.readAsText(file);
+  },
+  saveFromJson() { toast("Client saved from JSON (Demo Mode)", "success"); Modal.close(); }
+};
+
+function buildClientForm(c={}) {
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="form-group"><label class="form-label">PAN *</label>
+      <input class="form-input" id="cf-pan" value="${c.PAN||""}" placeholder="ABCDE1234F" style="text-transform:uppercase" maxlength="10"></div>
+    <div class="form-group"><label class="form-label">Full Name *</label>
+      <input class="form-input" id="cf-name" value="${c.FullName||""}" placeholder="As per PAN card"></div>
+    <div class="form-group"><label class="form-label">Entity Type *</label>
+      <select class="form-select" id="cf-entity">
+        ${["Individual","HUF","Firm","Company","LLP","AOP","BOI"].map(e=>`<option ${c.EntityType===e?"selected":""}>${e}</option>`).join("")}
+      </select></div>
+    <div class="form-group"><label class="form-label">Client Category</label>
+      <select class="form-select" id="cf-cat">
+        ${["Salaried","Business","Professional","Capital_Gains","Multiple"].map(e=>`<option ${c.ClientCategory===e?"selected":""}>${e}</option>`).join("")}
+      </select></div>
+    <div class="form-group"><label class="form-label">Mobile *</label>
+      <input class="form-input" id="cf-mobile" value="${c.MobileNo||""}" placeholder="10-digit mobile" maxlength="10"></div>
+    <div class="form-group"><label class="form-label">Email</label>
+      <input class="form-input" id="cf-email" type="email" value="${c.Email||""}" placeholder="email@domain.com"></div>
+    <div class="form-group"><label class="form-label">City</label>
+      <input class="form-input" value="${c.City||""}" placeholder="City"></div>
+    <div class="form-group"><label class="form-label">State</label>
+      <input class="form-input" value="${c.State||""}" placeholder="State"></div>
+    <div class="form-group"><label class="form-label">Residential Status</label>
+      <select class="form-select">
+        ${["Resident","NRI","RNOR"].map(e=>`<option ${c.ResidentialStatus===e?"selected":""}>${e}</option>`).join("")}
+      </select></div>
+    <div class="form-group"><label class="form-label">Preferred Regime</label>
+      <select class="form-select">
+        <option ${c.PreferredRegime==="New"?"selected":""}>New</option>
+        <option ${c.PreferredRegime==="Old"?"selected":""}>Old</option>
+      </select></div>
+    <div class="form-group" style="grid-column:1/-1"><label class="form-label">Notes</label>
+      <textarea class="form-textarea" rows="2" placeholder="Any notes about this client">${c.Notes||""}</textarea></div>
+  </div>`;
+}
+
+function buildExtractedField(label, value) {
+  return `<div class="form-group"><label class="form-label">${label}</label>
+    <input class="form-input" value="${value}" ${value?"style='border-color:rgba(16,185,129,0.3)'":""}>
+    ${value?'<span class="form-hint text-success">✓ Auto-extracted</span>':'<span class="form-hint">Not found in JSON</span>'}</div>`;
+}
+
+function infoRow(label, value) {
+  return `<div style="display:flex;gap:8px;font-size:13px"><span style="color:var(--text3);width:110px;flex-shrink:0">${label}</span><span style="font-weight:500">${value||"—"}</span></div>`;
+}
+
+function switchProfileTab(el, tabId) {
+  document.querySelectorAll("#profile-tabs .tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  ["tab-overview","tab-returns","tab-notes"].forEach(id=>{
+    const el2 = document.getElementById(id);
+    if(el2) el2.style.display = id===tabId?"block":"none";
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RETURN MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ReturnModule = {
+  viewMode: "table",
+  returns: [],
+
+  async render() {
+    document.getElementById("content").innerHTML = `
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="form-input" id="ret-search" placeholder="Search client, PAN..." oninput="ReturnModule.search(this.value)">
+      </div>
+      <select class="form-select" style="width:160px" onchange="ReturnModule.filterStatus(this.value)">
+        <option value="">All Statuses</option>
+        ${Object.entries(STATUS_CONFIG).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}
+      </select>
+      <select class="form-select" style="width:120px" onchange="ReturnModule.filterForm(this.value)">
+        <option value="">All Forms</option>
+        ${["ITR-1","ITR-2","ITR-3","ITR-4","ITR-5","ITR-6","ITR-7"].map(f=>`<option>${f}</option>`).join("")}
+      </select>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn btn-ghost btn-xs ${this.viewMode==='table'?'active':''}" onclick="ReturnModule.setView('table')">☰</button>
+        <button class="btn btn-ghost btn-xs ${this.viewMode==='kanban'?'active':''}" onclick="ReturnModule.setView('kanban')">⊟</button>
+        <button class="btn btn-secondary btn-sm" onclick="ReturnModule.bulkActions()">Bulk Actions ▾</button>
+        <button class="btn btn-primary btn-sm" onclick="ReturnModule.openCreate()">+ New Return</button>
+      </div>
+    </div>
+    <div class="return-stats" id="ret-stats"></div>
+    <div id="ret-view-wrap"></div>`;
+
+    await this.loadReturns();
+  },
+
+  async loadReturns(params={}) {
+    try {
+      const res = await API.call("getReturns", { ay: Store.get("currentAY"), pageSize:100, ...params });
+      this.returns = res.returns || DEMO_DATA.returns;
+    } catch(e) { this.returns = DEMO_DATA.returns; }
+    this.renderStats();
+    if (this.viewMode === "kanban") this.renderKanban();
+    else this.renderTable();
+  },
+
+  renderStats() {
+    const sc = {};
+    this.returns.forEach(r => { sc[r.ReturnStatus] = (sc[r.ReturnStatus]||0)+1; });
+    const filed = (sc.FILED||0)+(sc.ACKNOWLEDGED||0)+(sc.COMPLETED||0);
+    document.getElementById("ret-stats").innerHTML = `
+      <div class="return-stat"><span class="return-stat-val">${this.returns.length}</span> Total</div>
+      <div class="return-stat"><span class="return-stat-val text-success">${filed}</span> Filed/Done</div>
+      <div class="return-stat"><span class="return-stat-val text-warning">${(sc.IN_PREPARATION||0)+(sc.DOCS_RECEIVED||0)}</span> In Progress</div>
+      <div class="return-stat"><span class="return-stat-val text-muted">${sc.PENDING_DOCS||0}</span> Pending Docs</div>
+      <div class="return-stat"><span class="return-stat-val text-danger">${this.returns.filter(r=>daysLeft(r.StatutoryDueDate)<0&&!["FILED","ACKNOWLEDGED","COMPLETED"].includes(r.ReturnStatus)).length}</span> Overdue</div>`;
+  },
+
+  renderTable() {
+    const wrap = document.getElementById("ret-view-wrap");
+    if (!this.returns.length) { wrap.innerHTML=`<div class="card"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No returns found</div></div></div>`; return; }
+    wrap.innerHTML = `<div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+      <thead><tr>
+        <th><input type="checkbox"></th>
+        <th>Client</th><th>PAN</th><th>AY</th><th>Form</th>
+        <th>Filing Type</th><th>Status</th><th>Due Date</th><th>Days Left</th>
+        <th>Tax Paid</th><th>Refund</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${this.returns.map(r=>{
+        const overdue = daysLeft(r.StatutoryDueDate)<0 && !["FILED","ACKNOWLEDGED","COMPLETED"].includes(r.ReturnStatus);
+        return `<tr class="${overdue?"tr-overdue":""}">
+          <td><input type="checkbox" class="row-cb"></td>
+          <td><div style="font-weight:600;font-size:13px">${r.ClientName}</div></td>
+          <td>${panDisplay(r.PAN)}</td>
+          <td style="font-size:12px;font-weight:500">${r.AY}</td>
+          <td>${itrTag(r.ITRFormType)}</td>
+          <td><span class="badge badge-prep">${r.FilingType}</span></td>
+          <td>${statusBadge(r.ReturnStatus)}</td>
+          <td style="font-size:12px">${r.StatutoryDueDate||"—"}</td>
+          <td>${daysChip(r.StatutoryDueDate, r.ReturnStatus)}</td>
+          <td class="currency-sm">${fmtINR(r.TaxPaid)}</td>
+          <td class="currency-sm ${r.Refund>0?'text-success':''}">${r.Refund>0?fmtINR(r.Refund):"—"}</td>
+          <td><div style="display:flex;gap:3px">
+            <button class="btn btn-ghost btn-xs" onclick="ReturnModule.openDetail('${r.ReturnID}')">View</button>
+            <button class="btn btn-ghost btn-xs" onclick="ReturnModule.openStatusUpdate('${r.ReturnID}','${r.ReturnStatus}')">Status</button>
+            <button class="btn btn-ghost btn-xs" onclick="InvoiceModule.openGenerate('${r.ReturnID}')">Invoice</button>
+          </div></td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table></div></div>`;
+  },
+
+  renderKanban() {
+    const cols = Object.keys(STATUS_CONFIG);
+    const byStatus = {};
+    cols.forEach(k => { byStatus[k] = this.returns.filter(r => r.ReturnStatus === k); });
+    const wrap = document.getElementById("ret-view-wrap");
+    wrap.innerHTML = `<div class="kanban-board">${cols.map(k => {
+      const cfg = STATUS_CONFIG[k];
+      const items = byStatus[k];
+      return `<div class="kanban-col">
+        <div class="kanban-col-header">
+          <span style="color:${cfg.color}">${cfg.label}</span>
+          <span style="background:${cfg.color}33;color:${cfg.color};padding:1px 6px;border-radius:10px;font-size:10px">${items.length}</span>
+        </div>
+        ${items.map(r=>`<div class="kanban-card" onclick="ReturnModule.openDetail('${r.ReturnID}')">
+          <div class="kanban-card-name">${r.ClientName}</div>
+          <div class="kanban-card-pan">${r.PAN}</div>
+          <div style="display:flex;gap:4px;margin-top:6px">${itrTag(r.ITRFormType)}<span style="font-size:11px;color:var(--text3)">${r.AY}</span></div>
+        </div>`).join("")}
+      </div>`;
+    }).join("")}</div>`;
+  },
+
+  setView(v) { this.viewMode=v; if(this.viewMode==="kanban") this.renderKanban(); else this.renderTable(); },
+  search: debounce(function(q){ ReturnModule.loadReturns({search:q}); }, 300),
+  filterStatus(s) { ReturnModule.loadReturns({status:s}); },
+  filterForm(f) { ReturnModule.loadReturns({itrForm:f}); },
+
+  openDetail(returnId) {
+    const r = DEMO_DATA.returns.find(x=>x.ReturnID===returnId) || {};
+    Modal.open(`Return Detail — ${r.ClientName}`,`
+      <div class="grid-2 gap-16">
+        <div>
+          ${infoRow("Return ID", r.ReturnID)}
+          ${infoRow("Client", r.ClientName)}
+          ${infoRow("PAN", `<span class="pan-text">${r.PAN}</span>`)}
+          ${infoRow("AY", r.AY)} ${infoRow("Form", itrTag(r.ITRFormType))}
+          ${infoRow("Filing Type", r.FilingType)}
+          ${infoRow("Status", statusBadge(r.ReturnStatus))}
+          ${infoRow("Statutory Due", r.StatutoryDueDate||"—")}
+          ${infoRow("Internal Due", r.InternalDueDate||"—")}
+        </div>
+        <div>
+          ${infoRow("Total Income", fmtINR(r.TotalIncome))}
+          ${infoRow("Tax Payable", fmtINR(r.TaxPayable))}
+          ${infoRow("Tax Paid", fmtINR(r.TaxPaid))}
+          ${infoRow("Refund", r.Refund>0?fmtINR(r.Refund):"Nil")}
+          ${infoRow("Balance Due", r.BalanceDue>0?fmtINR(r.BalanceDue):"Nil")}
+          ${r.ActualFilingDate?infoRow("Filed On", r.ActualFilingDate):""}
+          ${r.AcknowledgmentNo?infoRow("Ack No.", `<span class="pan-text">${r.AcknowledgmentNo}</span>`):""}
+          ${infoRow("Assigned To", r.AssignedStaffID||"—")}
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="form-group"><label class="form-label">Return Notes</label>
+        <div style="padding:10px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--text2)">${r.ReturnNotes||"No notes added."}</div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Close</button>
+       <button class="btn btn-secondary" onclick="ReturnModule.openStatusUpdate('${returnId}','${r.ReturnStatus}');Modal.close()">Update Status</button>
+       <button class="btn btn-primary" onclick="InvoiceModule.openGenerate('${returnId}');Modal.close()">Generate Invoice</button>`,
+      true
+    );
+  },
+
+  openStatusUpdate(returnId, currentStatus) {
+    const nextSteps = {
+      PENDING_DOCS: ["DOCS_RECEIVED"],
+      DOCS_RECEIVED: ["IN_PREPARATION"],
+      IN_PREPARATION: ["REVIEW_PENDING"],
+      REVIEW_PENDING: ["CLIENT_APPROVAL_PENDING","IN_PREPARATION"],
+      CLIENT_APPROVAL_PENDING: ["FILED","IN_PREPARATION"],
+      FILED: ["ACKNOWLEDGED","DEFECTIVE"],
+      ACKNOWLEDGED: ["COMPLETED","REVISED_NEEDED"],
+      DEFECTIVE: ["IN_PREPARATION"],
+      REVISED_NEEDED: ["IN_PREPARATION"],
+      COMPLETED: []
+    };
+    const next = nextSteps[currentStatus] || Object.keys(STATUS_CONFIG);
+    Modal.open("Update Return Status", `
+      <div class="form-group mb-16">
+        <label class="form-label">Current Status</label>
+        <div style="padding:10px">${statusBadge(currentStatus)}</div>
+      </div>
+      <div class="form-group mb-16">
+        <label class="form-label">New Status *</label>
+        <select class="form-select" id="new-status">
+          ${next.map(s=>`<option value="${s}">${STATUS_CONFIG[s]?.label||s}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group mb-16" id="ack-field" style="${currentStatus==="CLIENT_APPROVAL_PENDING"?"":"display:none"}">
+        <label class="form-label">Acknowledgment Number</label>
+        <input class="form-input" id="ack-no" placeholder="15-digit Ack number">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (mandatory)</label>
+        <textarea class="form-textarea" id="status-notes" rows="3" placeholder="Reason for status change, next steps, etc."></textarea>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="ReturnModule.submitStatusUpdate('${returnId}')">Update Status</button>`
+    );
+    document.getElementById("new-status")?.addEventListener("change", function(){
+      const ackField = document.getElementById("ack-field");
+      if(ackField) ackField.style.display = this.value==="FILED"?"block":"none";
+    });
+  },
+
+  submitStatusUpdate(returnId) {
+    const notes = document.getElementById("status-notes")?.value?.trim();
+    if (!notes) { toast("Please add notes for this status change", "warning"); return; }
+    const newStatus = document.getElementById("new-status")?.value;
+    toast(`Status updated to "${STATUS_CONFIG[newStatus]?.label||newStatus}" (Demo Mode)`, "success");
+    Modal.close();
+    // Refresh
+    this.loadReturns();
+  },
+
+  openCreate() {
+    const clients = DEMO_DATA.clients;
+    const ayConfig = AYManager.ayData || DEMO_DATA.systemAY;
+    Modal.open("Create New Return", `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Client *</label>
+          <select class="form-select" id="rc-client" onchange="ReturnModule.autoFillClient(this.value)">
+            <option value="">Select client...</option>
+            ${clients.map(c=>`<option value="${c.ClientID}">${c.FullName} (${c.PAN})</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Assessment Year</label>
+          <select class="form-select" id="rc-ay">
+            ${(ayConfig.supportedAYs||["AY 2026-27"]).map(a=>`<option ${a===Store.get("currentAY")?"selected":""}>${a}</option>`).join("")}
+          </select></div>
+        <div class="form-group"><label class="form-label">ITR Form</label>
+          <select class="form-select" id="rc-form">
+            ${["ITR-1","ITR-2","ITR-3","ITR-4","ITR-5","ITR-6","ITR-7"].map(f=>`<option>${f}</option>`).join("")}
+          </select></div>
+        <div class="form-group"><label class="form-label">Filing Type</label>
+          <select class="form-select" id="rc-ftype">
+            <option>Original</option><option>Revised</option><option>Belated</option><option>Updated</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Statutory Due Date</label>
+          <input class="form-input" id="rc-sdate" placeholder="e.g. 31-Jul-2026"></div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="rc-notes" rows="2"></textarea></div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="ReturnModule.submitCreate()">Create Return</button>`
+    );
+  },
+
+  autoFillClient(clientId) {
+    const c = DEMO_DATA.clients.find(x=>x.ClientID===clientId);
+    if (!c) return;
+    const formMap = { Company:"ITR-6", Firm:"ITR-5", LLP:"ITR-5", HUF:"ITR-5", AOP:"ITR-5", BOI:"ITR-5" };
+    const catMap = { Business:"ITR-3", Professional:"ITR-4", Capital_Gains:"ITR-2", Multiple:"ITR-2" };
+    const form = formMap[c.EntityType] || catMap[c.ClientCategory] || "ITR-1";
+    const sel = document.getElementById("rc-form");
+    if(sel) sel.value = form;
+  },
+
+  submitCreate() {
+    if(!document.getElementById("rc-client")?.value) { toast("Please select a client", "warning"); return; }
+    toast("Return created successfully (Demo Mode)", "success");
+    Modal.close();
+    this.loadReturns();
+  },
+
+  bulkActions() {
+    toast("Select rows first, then use bulk actions (Demo Mode)", "info");
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPLIANCE MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ComplianceModule = {
+  async render() {
+    const [events, alerts] = await Promise.all([
+      API.call("getCalendar", { ay: Store.get("currentAY") }).catch(()=>getDemoCalendar()),
+      API.call("getPendingAlerts", {}).catch(()=>getDemoAlerts())
+    ]);
+
+    document.getElementById("content").innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px">
+      <!-- Calendar events -->
+      <div class="card">
+        <div class="section-header">
+          <div><div class="section-title">Compliance Calendar</div><div class="section-sub">All upcoming statutory deadlines and events</div></div>
+          <select class="form-select" style="width:140px" onchange="ComplianceModule.filterEvents(this.value)">
+            <option value="">All Events</option>
+            <option value="ITR">ITR Deadlines</option>
+            <option value="ADVANCE_TAX">Advance Tax</option>
+          </select>
+        </div>
+        <div id="calendar-events"></div>
+      </div>
+      <!-- Alerts panel -->
+      <div class="card">
+        <div class="section-header">
+          <div><div class="section-title">Active Alerts</div><div class="section-sub">${alerts.length} alert(s) requiring attention</div></div>
+        </div>
+        <div id="alert-panel"></div>
+      </div>
+    </div>
+
+    <!-- Penalty Calculator -->
+    <div class="card">
+      <div class="section-title mb-16">Penalty Calculator — u/s 234F / 234A</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end">
+        <div class="form-group"><label class="form-label">Total Income (₹)</label>
+          <input class="form-input" id="pc-income" type="number" placeholder="e.g. 1200000" oninput="ComplianceModule.calcPenalty()"></div>
+        <div class="form-group"><label class="form-label">Tax Due (₹)</label>
+          <input class="form-input" id="pc-taxdue" type="number" placeholder="After TDS credit" oninput="ComplianceModule.calcPenalty()"></div>
+        <div class="form-group"><label class="form-label">Due Date</label>
+          <input class="form-input" id="pc-duedate" type="text" placeholder="31-Jul-2026" oninput="ComplianceModule.calcPenalty()"></div>
+        <div class="form-group"><label class="form-label">Filing Date</label>
+          <input class="form-input" id="pc-actualdate" type="text" placeholder="Leave blank = today" oninput="ComplianceModule.calcPenalty()"></div>
+        <button class="btn btn-primary" onclick="ComplianceModule.calcPenalty()">Calculate</button>
+      </div>
+      <div id="penalty-result" class="mt-16"></div>
+    </div>`;
+
+    this.renderEvents(events);
+    this.renderAlerts(alerts);
+  },
+
+  renderEvents(events) {
+    const el = document.getElementById("calendar-events");
+    if (!events.length) { el.innerHTML=`<div class="empty-state"><div class="empty-title">No events found</div></div>`; return; }
+    const grouped = { overdue: events.filter(e=>e.urgency==="overdue"), critical: events.filter(e=>e.urgency==="critical"), warning: events.filter(e=>e.urgency==="warning"), normal: events.filter(e=>e.urgency==="normal") };
+    const sections = [
+      { key:"overdue", label:"Overdue", color:"var(--danger)" },
+      { key:"critical", label:"Critical (≤7 days)", color:"var(--danger)" },
+      { key:"warning", label:"Upcoming (≤15 days)", color:"var(--warning)" },
+      { key:"normal", label:"Future Events", color:"var(--success)" }
+    ];
+    el.innerHTML = sections.filter(s=>grouped[s.key].length>0).map(s=>`
+      <div class="mt-16">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:${s.color};margin-bottom:8px">${s.label}</div>
+        ${grouped[s.key].map(e=>`
+          <div style="display:flex;gap:12px;padding:10px 12px;border-radius:8px;background:var(--bg3);margin-bottom:6px">
+            <div style="flex-shrink:0;text-align:center;min-width:50px">
+              <div style="font-size:18px;font-weight:700;color:${s.color};line-height:1">${e.daysLeft<0?Math.abs(e.daysLeft)+"d":e.daysLeft+"d"}</div>
+              <div style="font-size:10px;color:var(--text3)">${e.daysLeft<0?"overdue":"left"}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">${e.description}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px">${e.date} · Penalty: ${e.penalty}</div>
+            </div>
+          </div>`).join("")}
+      </div>`).join("");
+  },
+
+  renderAlerts(alerts) {
+    const el = document.getElementById("alert-panel");
+    if (!alerts.length) { el.innerHTML=`<div class="empty-state" style="padding:32px"><div class="empty-icon">✅</div><div class="empty-title">No active alerts</div></div>`; return; }
+    el.innerHTML = alerts.map(a=>`
+      <div class="alert-item">
+        <div class="alert-dot ${a.priority.toLowerCase()}"></div>
+        <div>
+          <div class="alert-name">${a.clientName||a.type}</div>
+          <div class="alert-meta">${a.pan||""} · ${a.ay||""}</div>
+          <div style="font-size:12px;color:${a.priority==='Critical'?'var(--danger)':a.priority==='High'?'var(--warning)':'var(--info)'};margin-top:3px">${a.message}</div>
+        </div>
+        <button class="btn btn-ghost btn-xs ml-auto" onclick="ReturnModule.openStatusUpdate('${a.returnId||''}','PENDING_DOCS')">Act</button>
+      </div>`).join("");
+  },
+
+  filterEvents(type) {
+    const events = getDemoCalendar().filter(e => !type || e.type.startsWith(type));
+    this.renderEvents(events);
+  },
+
+  calcPenalty() {
+    const income = parseFloat(document.getElementById("pc-income")?.value)||0;
+    const taxDue = parseFloat(document.getElementById("pc-taxdue")?.value)||0;
+    const dueDateStr = document.getElementById("pc-duedate")?.value||"";
+    const actualStr = document.getElementById("pc-actualdate")?.value||"";
+
+    if (!income || !dueDateStr) return;
+
+    const parseDate = s => {
+      const m = s.match(/(\d{1,2})[\/\-](\w+)[\/\-](\d{4})/);
+      return m ? new Date(s.replace(/(\d{2})-([A-Za-z]{3})-(\d{4})/, "$1 $2 $3")) : new Date(s);
+    };
+
+    const dueDate = parseDate(dueDateStr);
+    const actualDate = actualStr ? parseDate(actualStr) : new Date();
+
+    if (isNaN(dueDate.getTime())) return;
+
+    const isLate = actualDate > dueDate;
+    const monthsLate = isLate ? Math.max(1, Math.ceil((actualDate - dueDate) / (30*24*60*60*1000))) : 0;
+    const fee234F = !isLate ? 0 : income <= 500000 ? 1000 : 5000;
+    const interest234A = isLate ? Math.round(taxDue * 0.01 * monthsLate) : 0;
+    const total = fee234F + interest234A;
+
+    const res = document.getElementById("penalty-result");
+    res.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="kpi-card ${isLate?'red':'green'}" style="padding:14px">
+          <div class="kpi-label">Section 234F (Late Filing Fee)</div>
+          <div class="kpi-value" style="font-size:22px">${fmtINR(fee234F)}</div>
+          <div class="kpi-sub">${isLate?(income<=500000?"Income ≤ ₹5L → ₹1,000":"Income > ₹5L → ₹5,000"):"Filed on time"}</div>
+        </div>
+        <div class="kpi-card ${isLate?'red':'green'}" style="padding:14px">
+          <div class="kpi-label">Section 234A (Interest on Tax Due)</div>
+          <div class="kpi-value" style="font-size:22px">${fmtINR(interest234A)}</div>
+          <div class="kpi-sub">1% per month × ${monthsLate} month(s)</div>
+        </div>
+        <div class="kpi-card ${isLate?'red':'green'}" style="padding:14px">
+          <div class="kpi-label">Total Penalty &amp; Interest</div>
+          <div class="kpi-value" style="font-size:22px;color:${isLate?'var(--danger)':'var(--success)'}">${fmtINR(total)}</div>
+          <div class="kpi-sub">${isLate?`${monthsLate} month(s) late`:"No penalty applicable"}</div>
+        </div>
+      </div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INVOICE MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const InvoiceModule = {
+  async render() {
+    const res = await API.call("getInvoices", { ay: Store.get("currentAY") }).catch(()=>({invoices:getDemoInvoices()}));
+    const invoices = res.invoices || getDemoInvoices();
+    const totalInvoiced = invoices.reduce((s,i)=>s+parseFloat(i.TotalAmount||0),0);
+    const collected = invoices.filter(i=>i.PaymentStatus==="Paid").reduce((s,i)=>s+parseFloat(i.TotalAmount||0),0);
+
+    document.getElementById("content").innerHTML = `
+    <div class="grid-4 mb-16">
+      <div class="kpi-card orange"><div class="kpi-label">Total Invoiced</div><div class="kpi-value" style="font-size:20px">${fmtINR(totalInvoiced)}</div><div class="kpi-sub">${invoices.length} invoices</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Collected</div><div class="kpi-value" style="font-size:20px">${fmtINR(collected)}</div><div class="kpi-sub">${invoices.filter(i=>i.PaymentStatus==="Paid").length} paid</div></div>
+      <div class="kpi-card red"><div class="kpi-label">Outstanding</div><div class="kpi-value" style="font-size:20px">${fmtINR(totalInvoiced-collected)}</div><div class="kpi-sub">${invoices.filter(i=>i.PaymentStatus!=="Paid").length} unpaid</div></div>
+      <div class="kpi-card blue"><div class="kpi-label">Collection Rate</div><div class="kpi-value">${totalInvoiced>0?Math.round(collected/totalInvoiced*100):0}%</div><div class="kpi-sub">For ${Store.get("currentAY")}</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <div class="section-title">Invoice Register</div>
+        <select class="form-select" style="width:130px;margin-left:auto" onchange="InvoiceModule.filterPayment(this.value)">
+          <option value="">All</option><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option><option value="Partial">Partial</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="InvoiceModule.openGenerate()">+ New Invoice</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Invoice No.</th><th>Client</th><th>AY</th><th>Form</th>
+          <th>Date</th><th>Base</th><th>GST</th><th>Total</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${invoices.map(i=>`<tr>
+          <td class="text-mono" style="font-size:12px">${i.InvoiceNo||i.InvoiceID}</td>
+          <td style="font-weight:500">${i.ClientName}</td>
+          <td style="font-size:12px">${i.AY}</td>
+          <td>${itrTag(i.ITRFormType)}</td>
+          <td style="font-size:12px">${i.InvoiceDate||"—"}</td>
+          <td class="currency-sm">${fmtINR(i.BaseAmount)}</td>
+          <td class="currency-sm">${fmtINR((i.IGST||0)+(i.CGST||0)+(i.SGST||0))}</td>
+          <td class="currency-sm" style="font-weight:600">${fmtINR(i.TotalAmount)}</td>
+          <td><span class="badge ${i.PaymentStatus==="Paid"?"badge-filed":i.PaymentStatus==="Partial"?"badge-docs":"badge-pending"}">${i.PaymentStatus}</span></td>
+          <td><div style="display:flex;gap:3px">
+            <button class="btn btn-ghost btn-xs" onclick="InvoiceModule.viewInvoice('${i.InvoiceID}')">View</button>
+            ${i.PaymentStatus!=="Paid"?`<button class="btn btn-ghost btn-xs text-success" onclick="InvoiceModule.markPaid('${i.InvoiceID}')">Mark Paid</button>`:""}
+          </div></td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+  },
+
+  filterPayment(status) { InvoiceModule.render(); },
+
+  openGenerate(returnId) {
+    const r = returnId ? DEMO_DATA.returns.find(x=>x.ReturnID===returnId) : null;
+    Modal.open("Generate Invoice", `
+      <div style="display:grid;gap:14px">
+        <div class="form-group"><label class="form-label">Return / Client</label>
+          <select class="form-select" id="inv-return">
+            <option value="">Select a filed return...</option>
+            ${DEMO_DATA.returns.map(r=>`<option value="${r.ReturnID}" ${r.ReturnID===returnId?"selected":""}>${r.ClientName} — ${r.AY} (${r.ITRFormType})</option>`).join("")}
+          </select></div>
+        <div class="grid-2 gap-16">
+          <div class="form-group"><label class="form-label">Base Fee (₹)</label>
+            <input class="form-input" id="inv-base" type="number" value="1200" oninput="InvoiceModule.calcPreview()"></div>
+          <div class="form-group"><label class="form-label">Discount (₹)</label>
+            <input class="form-input" id="inv-discount" type="number" value="0" oninput="InvoiceModule.calcPreview()"></div>
+        </div>
+        <div id="inv-preview" style="padding:14px;background:var(--bg3);border-radius:8px;font-size:13px"></div>
+        <div class="form-group"><label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="inv-notes" rows="2" placeholder="Service description, etc."></textarea></div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="InvoiceModule.submitGenerate()">Generate Invoice</button>`
+    );
+    InvoiceModule.calcPreview();
+  },
+
+  calcPreview() {
+    const base = parseFloat(document.getElementById("inv-base")?.value)||0;
+    const disc = parseFloat(document.getElementById("inv-discount")?.value)||0;
+    const taxable = base - disc;
+    const cgst = Math.round(taxable*0.09);
+    const total = taxable + cgst*2;
+    const el = document.getElementById("inv-preview");
+    if(el) el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${infoRow("Base Fee", fmtINR(base))} ${infoRow("Discount", fmtINR(disc))}
+        ${infoRow("Taxable Amount", fmtINR(taxable))} ${infoRow("CGST 9%", fmtINR(cgst))}
+        ${infoRow("SGST 9%", fmtINR(cgst))} <div></div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px">
+        <span>Total Invoice Amount</span><span class="text-accent">${fmtINR(total)}</span>
+      </div>`;
+  },
+
+  submitGenerate() {
+    toast("Invoice generated (Demo Mode)", "success");
+    Modal.close();
+    InvoiceModule.render();
+  },
+
+  viewInvoice(invId) {
+    const inv = getDemoInvoices().find(i=>i.InvoiceID===invId)||{};
+    const gst = (inv.IGST||0)+(inv.CGST||0)+(inv.SGST||0);
+    Modal.open(`Invoice — ${inv.InvoiceNo||invId}`, `
+      <div style="border:1px solid var(--border);border-radius:8px;padding:20px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+          <div><div class="logo-text" style="font-family:var(--font-display);font-size:16px;font-weight:700">ITR Filing Services</div>
+            <div class="text-sm text-muted">Tax & Compliance Professionals</div></div>
+          <div style="text-align:right"><div class="text-xs text-muted">Invoice No.</div>
+            <div style="font-weight:700;font-family:var(--font-mono)">${inv.InvoiceNo||inv.InvoiceID}</div>
+            <div class="text-xs text-muted mt-4">Date: ${inv.InvoiceDate||"—"}</div></div>
+        </div>
+        <div class="grid-2 gap-16 mb-16">
+          <div><div class="text-xs text-muted mb-4">BILLED TO</div>
+            <div style="font-weight:600">${inv.ClientName}</div></div>
+          <div><div class="text-xs text-muted mb-4">SERVICE</div>
+            <div>ITR Filing — ${inv.ITRFormType} | ${inv.AY}</div></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr><th style="padding:8px;text-align:left;border-bottom:1px solid var(--border)">Description</th><th style="padding:8px;text-align:right;border-bottom:1px solid var(--border)">Amount</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:8px">ITR Filing Service — ${inv.ITRFormType} — ${inv.AY}</td><td style="padding:8px;text-align:right">${fmtINR(inv.BaseAmount)}</td></tr>
+            <tr><td style="padding:8px;color:var(--text3)">CGST @ 9%</td><td style="padding:8px;text-align:right;color:var(--text3)">${fmtINR(inv.CGST||0)}</td></tr>
+            <tr><td style="padding:8px;color:var(--text3)">SGST @ 9%</td><td style="padding:8px;text-align:right;color:var(--text3)">${fmtINR(inv.SGST||0)}</td></tr>
+            ${inv.IGST?`<tr><td style="padding:8px;color:var(--text3)">IGST @ 18%</td><td style="padding:8px;text-align:right;color:var(--text3)">${fmtINR(inv.IGST)}</td></tr>`:""}
+            <tr><td style="padding:8px;font-weight:700;border-top:1px solid var(--border)">Total</td><td style="padding:8px;text-align:right;font-weight:700;color:var(--accent);font-size:15px;border-top:1px solid var(--border)">${fmtINR(inv.TotalAmount)}</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span class="badge ${inv.PaymentStatus==="Paid"?"badge-filed":"badge-pending"}" style="font-size:13px;padding:6px 14px">${inv.PaymentStatus}</span>
+          ${inv.PaymentDate?`<span class="text-xs text-muted">Paid on ${inv.PaymentDate} via ${inv.PaymentMode||"—"}</span>`:""}
+        </div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Close</button>
+       <button class="btn btn-primary" onclick="window.print()">Print Invoice</button>`
+    );
+  },
+
+  markPaid(invId) {
+    Modal.open("Mark Invoice as Paid", `
+      <div style="display:grid;gap:14px">
+        <div class="grid-2 gap-14">
+          <div class="form-group"><label class="form-label">Payment Date</label>
+            <input class="form-input" id="pay-date" type="text" value="${fmtDate(new Date())}"></div>
+          <div class="form-group"><label class="form-label">Payment Mode</label>
+            <select class="form-select" id="pay-mode">
+              <option>UPI</option><option>Bank Transfer</option><option>Cheque</option><option>Cash</option><option>NEFT</option><option>RTGS</option>
+            </select></div>
+        </div>
+        <div class="form-group"><label class="form-label">Transaction Reference</label>
+          <input class="form-input" id="pay-ref" placeholder="UTR/Cheque number"></div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-success" onclick="InvoiceModule.submitMarkPaid('${invId}')">Confirm Payment</button>`
+    );
+  },
+
+  submitMarkPaid(invId) {
+    toast("Payment recorded (Demo Mode)", "success");
+    Modal.close();
+    InvoiceModule.render();
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAX ENGINE MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const TaxEngineModule = {
+  async render() {
+    document.getElementById("content").innerHTML = `
+    <div style="padding:12px 16px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;margin-bottom:20px;font-size:13px;color:var(--warning)">
+      ⚠️ <strong>Advisory Tool Only.</strong> This module provides tax analysis and calculations for reference purposes. Findings here do NOT automatically update return records. Final verification responsibility lies with the filing CA.
+    </div>
+    <div class="tabs" id="tax-tabs">
+      <div class="tab active" onclick="switchTaxTab(this,'tax-26as')">26AS / AIS Import</div>
+      <div class="tab" onclick="switchTaxTab(this,'tax-form16')">Form 16</div>
+      <div class="tab" onclick="switchTaxTab(this,'tax-whatif')">What-If Scenarios</div>
+      <div class="tab" onclick="switchTaxTab(this,'tax-suggest')">ITR Form Selector</div>
+    </div>
+
+    <div id="tax-26as">
+      <div class="grid-2 gap-16">
+        <div class="card">
+          <div class="section-title mb-16">Import 26AS Data</div>
+          <div class="drop-zone" style="margin-bottom:12px" onclick="toast('Upload via GAS backend when connected','info')">
+            <div style="font-size:28px;margin-bottom:6px">📊</div>
+            <div style="font-weight:600">Upload Form 26AS (XML/CSV)</div>
+            <div class="text-sm text-muted">Downloaded from TRACES portal</div>
+          </div>
+          <div class="drop-zone" onclick="toast('Upload via GAS backend when connected','info')">
+            <div style="font-size:28px;margin-bottom:6px">📋</div>
+            <div style="font-weight:600">Upload AIS JSON/PDF</div>
+            <div class="text-sm text-muted">Annual Information Statement</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title mb-16">Sample Analysis Summary</div>
+          <div style="display:grid;gap:10px">
+            <div class="kpi-card blue" style="padding:14px"><div class="kpi-label">TDS Available (26AS)</div><div class="kpi-value" style="font-size:20px">₹42,500</div><div class="kpi-sub">From 2 deductors</div></div>
+            <div class="kpi-card orange" style="padding:14px"><div class="kpi-label">AIS Income Reported</div><div class="kpi-value" style="font-size:20px">₹8,50,000</div><div class="kpi-sub">Salary + Interest</div></div>
+            <div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:12px;color:var(--success)">✅ 26AS and AIS TDS amounts match — no discrepancy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tax-form16" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">Form 16 Parser</div>
+        <div class="drop-zone mb-16" onclick="toast('Upload via GAS backend when connected','info')">
+          <div style="font-size:28px;margin-bottom:6px">📄</div>
+          <div style="font-weight:600">Upload Form 16 (Part A &amp; B)</div>
+          <div class="text-sm text-muted">PDF or XML format</div>
+        </div>
+        <div style="padding:14px;background:var(--bg3);border-radius:8px">
+          <div class="section-title" style="font-size:13px;margin-bottom:12px">Sample Extracted Data</div>
+          <div class="grid-2 gap-16">
+            ${infoRow("Employer", "TechCorp India Pvt Ltd")}
+            ${infoRow("Employer PAN", "AABCT1332L")}
+            ${infoRow("Gross Salary", "₹10,20,000")}
+            ${infoRow("Standard Deduction", "₹50,000")}
+            ${infoRow("Taxable Salary", "₹9,70,000")}
+            ${infoRow("TDS Deducted", "₹42,500")}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tax-whatif" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">What-If Scenario Planner</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div class="form-group mb-16"><label class="form-label">Client</label>
+              <select class="form-select" id="wi-client">
+                ${DEMO_DATA.clients.map(c=>`<option value="${c.ClientID}">${c.FullName}</option>`).join("")}
+              </select></div>
+            <div class="form-group mb-12"><label class="form-label">Gross Total Income (₹)</label>
+              <input class="form-input" id="wi-gross" type="number" value="1000000" oninput="TaxEngineModule.calcWhatIf()"></div>
+            <div class="form-group mb-12"><label class="form-label">Section 80C Investment (₹ max 1,50,000)</label>
+              <input class="form-input" id="wi-80c" type="number" value="150000" max="150000" oninput="TaxEngineModule.calcWhatIf()"></div>
+            <div class="form-group mb-12"><label class="form-label">HRA Exemption (₹)</label>
+              <input class="form-input" id="wi-hra" type="number" value="0" oninput="TaxEngineModule.calcWhatIf()"></div>
+            <div class="form-group mb-16"><label class="form-label">NPS (80CCD(1B)) (₹ max 50,000)</label>
+              <input class="form-input" id="wi-nps" type="number" value="0" oninput="TaxEngineModule.calcWhatIf()"></div>
+            <button class="btn btn-primary w-full" onclick="TaxEngineModule.calcWhatIf()">Calculate Savings</button>
+          </div>
+          <div id="wi-result" style="display:flex;align-items:center;justify-content:center;color:var(--text3)">
+            Fill inputs to see comparison →
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tax-suggest" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">ITR Form Selector</div>
+        <div class="grid-2 gap-16">
+          <div>
+            <div class="form-group mb-12"><label class="form-label">Entity Type</label>
+              <select class="form-select" id="fs-entity" onchange="TaxEngineModule.suggestForm()">
+                ${["Individual","HUF","Firm","Company","LLP","AOP","BOI"].map(e=>`<option>${e}</option>`).join("")}
+              </select></div>
+            <div style="display:grid;gap:8px">
+              ${[["fs-salary","Has Salary Income"],["fs-capgains","Has Capital Gains"],["fs-business","Has Business/Prof Income"],["fs-presumptive","Presumptive Taxation (44AD/ADA)"],["fs-foreign","Foreign Assets/Income"],["fs-rental","Multiple House Properties"]].map(([id,label])=>`
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" id="${id}" onchange="TaxEngineModule.suggestForm()" ${id==="fs-salary"?"checked":""}>
+                  ${label}
+                </label>`).join("")}
+              <div class="form-group mt-8"><label class="form-label">Total Income (₹)</label>
+                <input class="form-input" id="fs-income" type="number" value="1000000" oninput="TaxEngineModule.suggestForm()"></div>
+            </div>
+          </div>
+          <div id="form-suggestion" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:32px">
+            <div style="font-size:48px;font-weight:800;font-family:var(--font-display);color:var(--accent)" id="suggested-form">ITR-1</div>
+            <div id="form-reason" style="text-align:center;color:var(--text2);font-size:14px">Salaried individual with income ≤ ₹50L</div>
+            <div id="form-checklist" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    TaxEngineModule.calcWhatIf();
+    TaxEngineModule.suggestForm();
+  },
+
+  async calcWhatIf() {
+    const gross = parseFloat(document.getElementById("wi-gross")?.value)||0;
+    const c80 = Math.min(parseFloat(document.getElementById("wi-80c")?.value)||0, 150000);
+    const hra = parseFloat(document.getElementById("wi-hra")?.value)||0;
+    const nps = Math.min(parseFloat(document.getElementById("wi-nps")?.value)||0, 50000);
+    if (!gross) return;
+
+    const result = await API.call("getRegimeComparison", { grossTotal: gross, chapterVIA: c80+nps, hra, ay: Store.get("currentAY") })
+      .catch(()=>getDemoRegimeComparison({grossTotal:gross,chapterVIA:c80+nps}));
+
+    const el = document.getElementById("wi-result");
+    if (!el) return;
+    const oldT = result.oldRegime?.withHEC||0;
+    const newT = result.newRegime?.withHEC||0;
+    const rec = result.recommended;
+    el.innerHTML = `
+      <div style="width:100%">
+        <div class="grid-2 gap-12 mb-12">
+          <div class="kpi-card ${rec==='Old'?'green':'blue'}" style="padding:14px;${rec==='Old'?'border-color:rgba(16,185,129,0.4)':''}">
+            <div class="kpi-label">Old Regime</div>
+            <div class="kpi-value" style="font-size:20px">${fmtINR(oldT)}</div>
+            <div class="kpi-sub">Std Dedn ₹50K + 80C ₹${c80.toLocaleString("en-IN")}</div>
+            ${rec==='Old'?`<div style="margin-top:6px;font-size:11px;color:var(--success);font-weight:600">✓ RECOMMENDED</div>`:""}
+          </div>
+          <div class="kpi-card ${rec==='New'?'green':'blue'}" style="padding:14px;${rec==='New'?'border-color:rgba(16,185,129,0.4)':''}">
+            <div class="kpi-label">New Regime</div>
+            <div class="kpi-value" style="font-size:20px">${fmtINR(newT)}</div>
+            <div class="kpi-sub">Std Dedn ₹75K only</div>
+            ${rec==='New'?`<div style="margin-top:6px;font-size:11px;color:var(--success);font-weight:600">✓ RECOMMENDED</div>`:""}
+          </div>
+        </div>
+        <div style="padding:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">Tax Saving with ${rec} Regime</div>
+          <div style="font-size:28px;font-weight:800;color:var(--success);font-family:var(--font-display)">${fmtINR(result.saving||0)}</div>
+          <div style="font-size:12px;color:var(--text2)">${result.summary||""}</div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text3)">Breakeven deductions: You need ₹${(result.breakeven||0).toLocaleString("en-IN")}+ in Old Regime deductions for it to be better.</div>
+      </div>`;
+  },
+
+  suggestForm() {
+    const entity = document.getElementById("fs-entity")?.value;
+    const hasSalary = document.getElementById("fs-salary")?.checked;
+    const hasCap = document.getElementById("fs-capgains")?.checked;
+    const hasBiz = document.getElementById("fs-business")?.checked;
+    const hasPres = document.getElementById("fs-presumptive")?.checked;
+    const hasForeign = document.getElementById("fs-foreign")?.checked;
+    const totalIncome = parseFloat(document.getElementById("fs-income")?.value)||0;
+
+    let form = "ITR-1", reason = "", checklist = [];
+    if (entity === "Company") { form="ITR-6"; reason="Companies (other than those claiming exemption u/s 11) must file ITR-6"; }
+    else if (["Firm","LLP","AOP","BOI"].includes(entity)) { form="ITR-5"; reason="Partnership Firms, LLPs, AOPs, BOIs file ITR-5"; }
+    else if (hasBiz && !hasPres) { form="ITR-3"; reason="Business/profession income with books of accounts → ITR-3"; }
+    else if (hasBiz && hasPres) { form="ITR-4"; reason="Presumptive income u/s 44AD/44ADA/44AE → ITR-4"; }
+    else if (hasCap || hasForeign || totalIncome > 5000000) { form="ITR-2"; reason=hasCap?"Capital gains present → ITR-2":hasForeign?"Foreign assets/income → ITR-2":"Total income > ₹50L → ITR-2"; }
+    else { form="ITR-1"; reason="Salaried individual with salary/HP/other income and total income ≤ ₹50L"; }
+
+    const el = document.getElementById("suggested-form");
+    const re = document.getElementById("form-reason");
+    if(el) el.textContent = form;
+    if(re) re.textContent = reason;
+  }
+};
+
+function switchTaxTab(el, tabId) {
+  document.querySelectorAll("#tax-tabs .tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  ["tax-26as","tax-form16","tax-whatif","tax-suggest"].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.display=id===tabId?"block":"none";
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REGIME MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const RegimeModule = {
+  async render() {
+    document.getElementById("content").innerHTML = `
+    <div class="card mb-16">
+      <div class="section-title mb-16">Old vs New Regime Comparison — ${Store.get("currentAY")}</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr) auto;gap:12px;align-items:end">
+        <div class="form-group"><label class="form-label">Gross Total Income (₹)</label>
+          <input class="form-input" id="rc-gross" type="number" value="1200000" oninput="RegimeModule.compare()"></div>
+        <div class="form-group"><label class="form-label">Section 80C (₹)</label>
+          <input class="form-input" id="rc-80c" type="number" value="150000" oninput="RegimeModule.compare()"></div>
+        <div class="form-group"><label class="form-label">HRA Exemption (₹)</label>
+          <input class="form-input" id="rc-hra" type="number" value="0" oninput="RegimeModule.compare()"></div>
+        <div class="form-group"><label class="form-label">NPS 80CCD(1B) (₹)</label>
+          <input class="form-input" id="rc-nps" type="number" value="50000" oninput="RegimeModule.compare()"></div>
+        <div class="form-group"><label class="form-label">AY</label>
+          <select class="form-select" id="rc-ay2" onchange="RegimeModule.compare()">
+            <option value="AY 2026-27" selected>AY 2026-27</option>
+            <option value="AY 2025-26">AY 2025-26</option>
+          </select></div>
+        <button class="btn btn-primary" onclick="RegimeModule.compare()">Compare</button>
+      </div>
+    </div>
+    <div id="regime-result"></div>`;
+    RegimeModule.compare();
+  },
+
+  async compare() {
+    const gross = parseFloat(document.getElementById("rc-gross")?.value)||0;
+    const c80 = Math.min(parseFloat(document.getElementById("rc-80c")?.value)||0,150000);
+    const hra = parseFloat(document.getElementById("rc-hra")?.value)||0;
+    const nps = Math.min(parseFloat(document.getElementById("rc-nps")?.value)||0,50000);
+    const ay = document.getElementById("rc-ay2")?.value||"AY 2026-27";
+
+    const r = await API.call("getRegimeComparison",{grossTotal:gross,chapterVIA:c80+nps,hra,ay}).catch(()=>getDemoRegimeComparison({grossTotal:gross,chapterVIA:c80+nps}));
+    const el = document.getElementById("regime-result");
+    if (!el) return;
+
+    const oldT = r.oldRegime?.withHEC||0;
+    const newT = r.newRegime?.withHEC||0;
+    const saving = Math.abs(oldT-newT);
+    const rec = r.recommended||"New";
+
+    el.innerHTML = `
+    <div class="grid-2 gap-16 mb-16">
+      <div class="card ${rec==='Old'?'':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+          <div><div style="font-family:var(--font-display);font-size:16px;font-weight:700">Old Regime</div>
+            <div class="text-sm text-muted">With all deductions</div></div>
+          ${rec==='Old'?`<span class="badge badge-filed">✓ Recommended</span>`:""}
+        </div>
+        <div style="display:grid;gap:8px">
+          ${infoRow("Gross Total Income", fmtINR(gross))}
+          ${infoRow("Standard Deduction", fmtINR(50000))}
+          ${infoRow("80C + NPS", fmtINR(c80+nps))}
+          ${infoRow("HRA Exemption", fmtINR(hra))}
+          <div class="divider"></div>
+          ${infoRow("Taxable Income", fmtINR(r.oldRegime?.taxableIncome||0))}
+          ${infoRow("Tax (incl. HEC 4%)", `<strong style="color:${rec==='Old'?'var(--success)':'var(--danger)'};font-size:16px">${fmtINR(oldT)}</strong>`)}
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+          <div><div style="font-family:var(--font-display);font-size:16px;font-weight:700">New Regime</div>
+            <div class="text-sm text-muted">Reduced rates, minimal deductions</div></div>
+          ${rec==='New'?`<span class="badge badge-filed">✓ Recommended</span>`:""}
+        </div>
+        <div style="display:grid;gap:8px">
+          ${infoRow("Gross Total Income", fmtINR(gross))}
+          ${infoRow("Standard Deduction", fmtINR(75000))}
+          ${infoRow("Other Deductions", "₹0 (not applicable)")}
+          <div class="divider"></div>
+          ${infoRow("Taxable Income", fmtINR(r.newRegime?.taxableIncome||0))}
+          ${infoRow("Tax (incl. HEC 4%)", `<strong style="color:${rec==='New'?'var(--success)':'var(--danger)'};font-size:16px">${fmtINR(newT)}</strong>`)}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="text-align:center;padding:28px">
+      <div class="text-xs text-muted text-sm" style="text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Tax Savings with ${rec} Regime</div>
+      <div style="font-size:40px;font-weight:800;font-family:var(--font-display);color:var(--success)">${fmtINR(saving)}</div>
+      <div style="color:var(--text2);margin-top:8px">${r.summary||""}</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text3)">
+        You need total Old Regime deductions > <strong>₹${(r.breakeven||0).toLocaleString("en-IN")}</strong> for Old Regime to be beneficial at this income level.
+      </div>
+    </div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REPORTS MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ReportModule = {
+  async render() {
+    const stats = await API.call("getDashboardStats",{ay:Store.get("currentAY")}).catch(()=>DEMO_DATA.dashboardStats);
+    document.getElementById("content").innerHTML = `
+    <div class="tabs" id="rep-tabs">
+      <div class="tab active" onclick="switchRepTab(this,'rep-compliance')">Compliance Summary</div>
+      <div class="tab" onclick="switchRepTab(this,'rep-revenue')">Revenue</div>
+      <div class="tab" onclick="switchRepTab(this,'rep-staff')">Staff Performance</div>
+    </div>
+    <div id="rep-compliance">
+      <div class="grid-4 mb-16">
+        <div class="kpi-card green"><div class="kpi-label">Compliance Score</div><div class="kpi-value">${stats.complianceScore}</div><div class="kpi-sub">${stats.complianceScore>=80?"Excellent":stats.complianceScore>=60?"Good":"Needs Attention"}</div></div>
+        <div class="kpi-card orange"><div class="kpi-label">Filing Rate</div><div class="kpi-value">${stats.filedPct}%</div><div class="kpi-sub">${stats.filed} of ${stats.totalReturns} filed</div></div>
+        <div class="kpi-card blue"><div class="kpi-label">Total Tax Paid</div><div class="kpi-value" style="font-size:18px">${fmtINR(stats.totalTaxPaid)}</div><div class="kpi-sub">All clients — current AY</div></div>
+        <div class="kpi-card purple"><div class="kpi-label">Total Refunds</div><div class="kpi-value" style="font-size:18px">${fmtINR(stats.totalRefund)}</div><div class="kpi-sub">Pending with IT dept</div></div>
+      </div>
+      <div class="grid-2 gap-16">
+        <div class="card">
+          <div class="section-title mb-16">Form Distribution — ${Store.get("currentAY")}</div>
+          <div class="chart-container-lg"><canvas id="form-dist-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-title mb-16">Status Breakdown</div>
+          ${Object.entries(stats.statusCounts||{}).filter(([,v])=>v>0).map(([k,v])=>{
+            const pct = stats.totalReturns>0?Math.round(v/stats.totalReturns*100):0;
+            const cfg = STATUS_CONFIG[k]||{label:k,color:"#64748B"};
+            return `<div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                <span>${cfg.label}</span><span style="font-weight:600">${v} (${pct}%)</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+    <div id="rep-revenue" style="display:none">
+      <div class="grid-4 mb-16">
+        <div class="kpi-card orange"><div class="kpi-label">Total Invoiced</div><div class="kpi-value" style="font-size:18px">${fmtINR(stats.revenue?.totalInvoiced||0)}</div></div>
+        <div class="kpi-card green"><div class="kpi-label">Collected</div><div class="kpi-value" style="font-size:18px">${fmtINR(stats.revenue?.totalCollected||0)}</div></div>
+        <div class="kpi-card red"><div class="kpi-label">Outstanding</div><div class="kpi-value" style="font-size:18px">${fmtINR(stats.revenue?.outstanding||0)}</div></div>
+        <div class="kpi-card blue"><div class="kpi-label">Collection Rate</div><div class="kpi-value">${stats.revenue?.totalInvoiced>0?Math.round((stats.revenue?.totalCollected||0)/(stats.revenue?.totalInvoiced||1)*100):0}%</div></div>
+      </div>
+      <div class="card"><div class="section-title mb-16">Revenue by ITR Form Type</div>
+        <div class="chart-container-lg"><canvas id="rev-chart"></canvas></div>
+      </div>
+    </div>
+    <div id="rep-staff" style="display:none">
+      <div class="card"><div class="section-title mb-16">Staff Performance — ${Store.get("currentAY")}</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Staff</th><th>Assigned</th><th>Completed</th><th>Pending</th><th>Completion Rate</th></tr></thead>
+          <tbody>${(stats.staffWorkload||[]).map(w=>`<tr>
+            <td style="font-weight:600">${{USR002:"CA Sharma",USR003:"Staff Kumar",USR001:"SuperAdmin"}[w.staffId]||w.staffId}</td>
+            <td>${w.clients}</td>
+            <td style="color:var(--success)">${w.completedReturns}</td>
+            <td style="color:var(--warning)">${w.pendingReturns}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="progress-bar" style="flex:1"><div class="progress-fill ${(w.completedReturns/(w.pendingReturns+w.completedReturns)||0)>=0.8?'green':''}" style="width:${Math.round((w.completedReturns/(w.pendingReturns+w.completedReturns||1))*100)}%"></div></div>
+                <span>${Math.round((w.completedReturns/(w.pendingReturns+w.completedReturns||1))*100)}%</span>
+              </div>
+            </td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </div>
+    </div>`;
+
+    // Form distribution chart
+    const fd = stats.formDistribution||{};
+    const fdCtx = document.getElementById("form-dist-chart")?.getContext("2d");
+    if(fdCtx) new Chart(fdCtx, {
+      type:"bar",
+      data:{ labels:Object.keys(fd), datasets:[{ data:Object.values(fd), backgroundColor:["#10B981","#3B82F6","#F97316","#8B5CF6","#F59E0B","#EF4444","#64748B"], borderRadius:6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{precision:0}}, x:{grid:{display:false}} } }
+    });
+  }
+};
+
+function switchRepTab(el, tabId) {
+  document.querySelectorAll("#rep-tabs .tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  ["rep-compliance","rep-revenue","rep-staff"].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=id===tabId?"block":"none"; });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUDIT MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const AuditModule = {
+  async render() {
+    const sampleLogs = [
+      { LogID:"LOG001", Timestamp:"05-May-2026 14:32:10", UserName:"CA Sharma", Action:"updateReturnStatus", EntityType:"Return", EntityID:"RET001", FieldChanged:"ReturnStatus", OldValue:'"DOCS_RECEIVED"', NewValue:'"IN_PREPARATION"', Module:"returns", AY:"AY 2026-27", Notes:"Documents reviewed, starting prep" },
+      { LogID:"LOG002", Timestamp:"05-May-2026 11:15:44", UserName:"Staff Kumar", Action:"createReturn", EntityType:"Return", EntityID:"RET010", FieldChanged:"", OldValue:"", NewValue:"", Module:"returns", AY:"AY 2026-27", Notes:"Auto-created on client onboarding" },
+      { LogID:"LOG003", Timestamp:"04-May-2026 16:48:22", UserName:"CA Sharma", Action:"generateInvoice", EntityType:"Invoice", EntityID:"INV001", FieldChanged:"", OldValue:"", NewValue:"", Module:"invoices", AY:"AY 2026-27", Notes:"Invoice for Rajesh Kumar Sharma" },
+      { LogID:"LOG004", Timestamp:"04-May-2026 10:05:11", UserName:"SuperAdmin", Action:"createClient", EntityType:"Client", EntityID:"CLI010", FieldChanged:"", OldValue:"", NewValue:"", Module:"clients", AY:"AY 2026-27", Notes:"Sunita Agarwal onboarded" },
+      { LogID:"LOG005", Timestamp:"03-May-2026 15:22:30", UserName:"Staff Kumar", Action:"updateReturnStatus", EntityType:"Return", EntityID:"RET007", FieldChanged:"ReturnStatus", OldValue:'"CLIENT_APPROVAL_PENDING"', NewValue:'"FILED"', Module:"returns", AY:"AY 2026-27", Notes:"Filed on portal, Ack 123456781234567" }
+    ];
+    document.getElementById("content").innerHTML = `
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+        <div class="section-title">Audit Trail</div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <select class="form-select" style="width:140px"><option value="">All Actions</option>
+            <option>updateReturnStatus</option><option>createClient</option><option>generateInvoice</option>
+          </select>
+          <select class="form-select" style="width:120px"><option value="">All Users</option>
+            <option>CA Sharma</option><option>Staff Kumar</option><option>SuperAdmin</option>
+          </select>
+          <button class="btn btn-secondary btn-sm">Export</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Entity</th><th>Entity ID</th><th>Change</th><th>AY</th><th>Notes</th></tr></thead>
+        <tbody>${sampleLogs.map(l=>`<tr>
+          <td class="text-mono" style="font-size:11px;white-space:nowrap">${l.Timestamp}</td>
+          <td style="font-weight:500">${l.UserName}</td>
+          <td><code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px">${l.Action}</code></td>
+          <td style="font-size:12px">${l.EntityType}</td>
+          <td class="text-mono" style="font-size:11px">${l.EntityID}</td>
+          <td style="font-size:11px;color:var(--text3)">${l.FieldChanged?`<span style="color:var(--warning)">${l.FieldChanged}</span>: ${l.OldValue} → <span style="color:var(--success)">${l.NewValue}</span>`:"—"}</td>
+          <td style="font-size:12px">${l.AY||"—"}</td>
+          <td style="font-size:12px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.Notes||"—"}</td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SETTINGS MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SettingsModule = {
+  async render() {
+    document.getElementById("content").innerHTML = `
+    <div class="tabs" id="set-tabs">
+      <div class="tab active" onclick="switchSetTab(this,'set-firm')">Firm Settings</div>
+      <div class="tab" onclick="switchSetTab(this,'set-ay')">AY Config</div>
+      <div class="tab" onclick="switchSetTab(this,'set-fees')">Fee Schedules</div>
+      <div class="tab" onclick="switchSetTab(this,'set-users')">User Management</div>
+      <div class="tab" onclick="switchSetTab(this,'set-notifs')">Notifications</div>
+    </div>
+
+    <div id="set-firm">
+      <div class="card">
+        <div class="section-title mb-16">Firm Information</div>
+        <div class="grid-2 gap-16">
+          ${buildSettingField("Firm Name","FIRM_NAME","ITR Filing Services","text")}
+          ${buildSettingField("Firm GSTIN","FIRM_GSTIN","07AABCT1332L1ZS","text")}
+          ${buildSettingField("Firm PAN","FIRM_PAN","AABCT1332L","text")}
+          ${buildSettingField("Email","FIRM_EMAIL","admin@itrfirm.com","email")}
+          ${buildSettingField("Phone","FIRM_PHONE","9876543210","tel")}
+          ${buildSettingField("State","FIRM_STATE","Delhi","text")}
+          ${buildSettingField("Bank Name","FIRM_BANK_NAME","State Bank of India","text")}
+          ${buildSettingField("Bank Account No.","FIRM_BANK_ACCOUNT","1234567890","text")}
+          ${buildSettingField("Bank IFSC","FIRM_BANK_IFSC","SBIN0001234","text")}
+          ${buildSettingField("Invoice Prefix","INVOICE_PREFIX","ITRF","text")}
+          ${buildSettingField("Internal Deadline Offset (days)","INTERNAL_DEADLINE_OFFSET","15","number")}
+          ${buildSettingField("Default Tax Regime","DEFAULT_REGIME","New","text")}
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn btn-primary" onclick="SettingsModule.saveFirmSettings()">Save Firm Settings</button>
+        </div>
+      </div>
+      <div class="card mt-16">
+        <div class="section-title mb-16">System Connection</div>
+        <div class="form-group mb-12"><label class="form-label">Google Apps Script Web App URL</label>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="gas-url" value="${CONFIG.GAS_URL}" placeholder="https://script.google.com/macros/s/.../exec">
+            <button class="btn btn-secondary" onclick="SettingsModule.testConnection()">Test</button>
+          </div>
+          <div class="form-hint">After deploying Code.gs as Web App, paste the URL here and update CONFIG.GAS_URL in index.html</div>
+        </div>
+        <div id="connection-status"></div>
+      </div>
+    </div>
+
+    <div id="set-ay" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">Assessment Year Configuration</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>AY</th><th>FY</th><th>Original (Individual)</th><th>Belated</th><th>Revised</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${[
+            {ay:"AY 2024-25",fy:"FY 2023-24",orig:"31-Jul-2024",belated:"31-Dec-2024",revised:"31-Dec-2024",status:"Past"},
+            {ay:"AY 2025-26",fy:"FY 2024-25",orig:"31-Jul-2025",belated:"31-Dec-2025",revised:"31-Dec-2025",status:"Active"},
+            {ay:"AY 2026-27",fy:"FY 2025-26",orig:"31-Jul-2026",belated:"31-Dec-2026",revised:"31-Dec-2026",status:"Active"},
+            {ay:"AY 2027-28",fy:"FY 2026-27",orig:"31-Jul-2027",belated:"31-Dec-2027",revised:"31-Dec-2027",status:"Future"},
+          ].map(r=>`<tr>
+            <td style="font-weight:600">${r.ay}</td><td>${r.fy}</td>
+            <td class="text-mono" style="font-size:12px">${r.orig}</td>
+            <td class="text-mono" style="font-size:12px">${r.belated}</td>
+            <td class="text-mono" style="font-size:12px">${r.revised}</td>
+            <td><span class="badge ${r.status==="Active"?"badge-filed":r.status==="Past"?"badge-pending":"badge-docs"}">${r.status}</span></td>
+            <td><button class="btn btn-ghost btn-xs" onclick="SettingsModule.editAY('${r.ay}')">Edit</button></td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+        <div class="mt-16 text-xs text-muted">ℹ When CBDT extends deadlines, click Edit to update with the new date and CBDT circular reference.</div>
+      </div>
+    </div>
+
+    <div id="set-fees" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">Fee Schedule Configuration</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>ITR Form</th><th>Filing Type</th><th>Entity</th><th>Base Fee</th><th>Min</th><th>Max</th><th>Active</th><th>Actions</th></tr></thead>
+          <tbody>${[
+            {form:"ITR-1",type:"Original",entity:"Individual",base:500,min:500,max:1500},
+            {form:"ITR-1",type:"Original",entity:"Individual",base:800,min:800,max:2000},
+            {form:"ITR-2",type:"Original",entity:"Individual",base:1500,min:1500,max:3000},
+            {form:"ITR-3",type:"Original",entity:"Individual",base:2500,min:2500,max:8000},
+            {form:"ITR-4",type:"Original",entity:"Individual",base:1200,min:1200,max:3500},
+            {form:"ITR-5",type:"Original",entity:"Firm",base:3000,min:3000,max:10000},
+            {form:"ITR-6",type:"Original",entity:"Company",base:5000,min:5000,max:25000},
+          ].map(f=>`<tr>
+            <td>${itrTag(f.form)}</td><td><span class="badge badge-prep">${f.type}</span></td>
+            <td style="font-size:12px">${f.entity}</td>
+            <td class="currency-sm">${fmtINR(f.base)}</td>
+            <td class="currency-sm">${fmtINR(f.min)}</td>
+            <td class="currency-sm">${fmtINR(f.max)}</td>
+            <td><span class="badge badge-filed">Active</span></td>
+            <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div id="set-users" style="display:none">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+          <div class="section-title">User Management</div>
+          <button class="btn btn-primary btn-sm ml-auto" onclick="SettingsModule.openCreateUser()">+ Add User</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+          <tbody>${[
+            {id:"USR001",name:"SuperAdmin",email:"admin@itrfirm.com",role:"SuperAdmin",active:true,login:"05-May-2026"},
+            {id:"USR002",name:"CA Sharma",email:"ca.sharma@itrfirm.com",role:"SeniorCA",active:true,login:"05-May-2026"},
+            {id:"USR003",name:"Staff Kumar",email:"kumar@itrfirm.com",role:"Staff",active:true,login:"04-May-2026"},
+          ].map(u=>`<tr>
+            <td class="text-mono" style="font-size:11px">${u.id}</td>
+            <td style="font-weight:600">${u.name}</td>
+            <td style="font-size:12px">${u.email}</td>
+            <td><span class="badge badge-review">${u.role}</span></td>
+            <td><span class="badge badge-filed">Active</span></td>
+            <td style="font-size:12px">${u.login}</td>
+            <td><div style="display:flex;gap:3px">
+              <button class="btn btn-ghost btn-xs">Edit</button>
+              <button class="btn btn-ghost btn-xs text-danger">Disable</button>
+            </div></td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div id="set-notifs" style="display:none">
+      <div class="card">
+        <div class="section-title mb-16">Notification Settings</div>
+        <div style="display:grid;gap:16px">
+          <div class="form-group"><label class="form-label">Alert Lead Times (days before deadline)</label>
+            <input class="form-input" value="30,15,7,3,1" placeholder="Comma-separated days"></div>
+          <div class="form-group"><label class="form-label">SMS Provider</label>
+            <select class="form-select"><option>MSG91</option><option>Fast2SMS</option><option>Textlocal</option></select></div>
+          <div class="form-group"><label class="form-label">SMS API Key</label>
+            <input class="form-input" type="password" placeholder="Enter API key"></div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="toast('Test notification sent (Demo Mode)','success')">Send Test Email</button>
+            <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="toast('Test SMS sent (Demo Mode)','success')">Send Test SMS</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  saveFirmSettings() { toast("Firm settings saved (Demo Mode)", "success"); },
+  editAY(ay) { toast(`Editing ${ay} — connect to GAS to save`, "info"); },
+  openCreateUser() {
+    Modal.open("Add New User", buildClientForm({}),
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="toast('User created (Demo Mode)','success');Modal.close()">Create User</button>`
+    );
+  },
+  async testConnection() {
+    const url = document.getElementById("gas-url")?.value;
+    const el = document.getElementById("connection-status");
+    if (!url || url.includes("YOUR_DEPLOYED")) {
+      el.innerHTML = `<div style="padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:13px;color:var(--warning)">⚠ No GAS URL configured. Running in Demo Mode.</div>`;
+      return;
+    }
+    el.innerHTML = `<div style="padding:10px 14px;font-size:13px">Testing connection...</div>`;
+    try {
+      const r = await fetch(url+"?test=1");
+      const d = await r.json();
+      el.innerHTML = `<div style="padding:10px 14px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:var(--success)">✅ Connected successfully! API version: ${d.version||"1.0.0"}</div>`;
+      CONFIG.GAS_URL = url;
+      CONFIG.DEMO_MODE = false;
+    } catch(e) {
+      el.innerHTML = `<div style="padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:var(--danger)">❌ Connection failed: ${e.message}</div>`;
+    }
+  }
+};
+
+function buildSettingField(label, key, value, type="text") {
+  return `<div class="form-group"><label class="form-label">${label}</label>
+    <input class="form-input" id="sf-${key}" type="${type}" value="${value}"></div>`;
+}
+function switchSetTab(el, tabId) {
+  document.querySelectorAll("#set-tabs .tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  ["set-firm","set-ay","set-fees","set-users","set-notifs"].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=id===tabId?"block":"none"; });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+const AppInit = {
+  async init() {
+    await AYManager.init();
+    await NotifManager.load();
+    Router.navigate("dashboard");
+  }
+};
+
+// Auto-login if session exists
+document.addEventListener("DOMContentLoaded", () => {
+  if (Auth.checkSession()) {
+    AppInit.init();
+  }
+  // Demo mode badge
+  if (CONFIG.DEMO_MODE) {
+    const badge = document.createElement("div");
+    badge.style.cssText = "position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);color:var(--accent);font-size:11px;padding:5px 14px;border-radius:20px;z-index:9999;pointer-events:none;font-weight:600";
+    badge.textContent = "🔶 DEMO MODE — Configure GAS_URL in Settings to go live";
+    document.body.appendChild(badge);
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   APP INIT
+═══════════════════════════════════════════════════════ */
+const AppInit={async init(){await AYManager.init();await NotifManager.load();Router.navigate("dashboard");}};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  if(Auth.checkSession()){AppInit.init();}
+  if(CONFIG.DEMO_MODE){
+    const b=document.createElement("div");
+    b.style.cssText="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.3);color:var(--accent);font-size:11px;padding:5px 16px;border-radius:20px;z-index:9999;pointer-events:none;font-weight:600;letter-spacing:.3px";
+    b.textContent="🔶 DEMO MODE — Enter GAS Web App URL in Settings → Firm Settings to go live";
+    document.body.appendChild(b);
+  }
+});
+</script>
+</body>
+</html>
